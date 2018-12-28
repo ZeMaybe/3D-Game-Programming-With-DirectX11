@@ -19,10 +19,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{A6B6239D-44C9-4197-AF3F-EA6BF583E6A0}</ProjectGuid>
+    <ProjectGuid>{F7304A3B-6711-4C55-99D3-DBDFA1E39AD9}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>My6Hills</RootNamespace>
+    <RootNamespace>Shapes</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <ProjectName>6-Shapes</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -151,8 +152,8 @@
     <ClCompile Include="..\Common\GameTimer.cpp" />
     <ClCompile Include="..\Common\GeometryGenerator.cpp" />
     <ClCompile Include="..\Common\MathHelper.cpp" />
-    <ClCompile Include="Hills.cpp" />
-    <ClCompile Include="HillsApp.cpp" />
+    <ClCompile Include="Shapes.cpp" />
+    <ClCompile Include="ShapesApp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Common\D3DApp.h" />
@@ -162,7 +163,7 @@
     <ClInclude Include="..\Common\GameTimer.h" />
     <ClInclude Include="..\Common\GeometryGenerator.h" />
     <ClInclude Include="..\Common\MathHelper.h" />
-    <ClInclude Include="HillsApp.h" />
+    <ClInclude Include="ShapesApp.h" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\FX\Color.fx">

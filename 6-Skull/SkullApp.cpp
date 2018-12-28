@@ -1,39 +1,40 @@
 
-#include "HillsApp.h"
-#include "GeometryGenerator.h"
+#include "SkullApp.h"
 #include <fstream>
+#include <vector>
+
 using namespace DirectX;
 
-HillsApp::HillsApp(HINSTANCE hInstance)
+SkullApp::SkullApp(HINSTANCE hInstance)
 	:D3DApp(hInstance)
 	,mTheta(1.5f*XM_PI)
-	, mPhi(0.1f*XM_PI)
-	, mRadius(200.0f)
+	,mPhi(0.1f*XM_PI)
+	,mRadius(20.0f)
 {
-	mMainWndCaption = L"Hills Demo";
-
+	mMainWndCaption = L"Skull Demo";
 	mLastMousePos.x = 0;
 	mLastMousePos.y = 0;
-
+	
 	XMMATRIX I = XMMatrixIdentity();
-	XMStoreFloat4x4(&mGridWorld, I);
 	XMStoreFloat4x4(&mView, I);
 	XMStoreFloat4x4(&mProj, I);
-} 
 
-HillsApp::~HillsApp()
+	XMMATRIX T = XMMatrixTranslation(0.0f, -2.0f, 0.0f);
+	XMStoreFloat4x4(&mSkullWorld, T);
+}
+
+SkullApp::~SkullApp()
 {
 	ReleaseCOM(mVB);
 	ReleaseCOM(mIB);
 	ReleaseCOM(mFX);
 	ReleaseCOM(mInputLayout);
-
+	ReleaseCOM(mWireframeRS);
 	ReleaseCOM(mTech);
 	ReleaseCOM(mfxWorldViewProj);
-	ReleaseCOM(mRasterizeStateWireFrame);
 }
 
-bool HillsApp::Init()
+bool SkullApp::Init()
 {
 	if (!D3DApp::Init())
 		return false;
@@ -41,11 +42,12 @@ bool HillsApp::Init()
 	BuildGeometryBuffers();
 	BuildFX();
 	BuildVertexLayout();
+	BuildRasterizerState();
 
 	return true;
 }
 
-void HillsApp::OnResize()
+void SkullApp::OnResize()
 {
 	D3DApp::OnResize();
 
@@ -53,7 +55,7 @@ void HillsApp::OnResize()
 	XMStoreFloat4x4(&mProj, P);
 }
 
-void HillsApp::UpdateScene(float dt)
+void SkullApp::UpdateScene(float dt)
 {
 	// Convert Spherical to Cartesian coordinates.
 	float x = mRadius*sinf(mPhi)*cosf(mTheta);
@@ -69,17 +71,19 @@ void HillsApp::UpdateScene(float dt)
 	XMStoreFloat4x4(&mView, V);
 }
 
-void HillsApp::DrawScene()
+void SkullApp::DrawScene()
 {
 	D3DApp::DrawScene();
 
 	md3dImmediateContext->IASetInputLayout(mInputLayout);
 	md3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	md3dImmediateContext->RSSetState(mWireframeRS);
 
 	XMMATRIX view = XMLoadFloat4x4(&mView);
 	XMMATRIX proj = XMLoadFloat4x4(&mProj);
-	XMMATRIX world = XMLoadFloat4x4(&mGridWorld);
+	XMMATRIX world = XMLoadFloat4x4(&mSkullWorld);
 	XMMATRIX worldViewProj = world*view*proj;
+	mfxWorldViewProj->SetMatrix(reinterpret_cast<float*>(&worldViewProj));
 
 	UINT stride = sizeof(Vertex);
 	UINT offset = 0;
@@ -90,16 +94,14 @@ void HillsApp::DrawScene()
 	mTech->GetDesc(&techDesc);
 	for (UINT p = 0; p < techDesc.Passes; ++p)
 	{
-		// Draw the grid.
-		mfxWorldViewProj->SetMatrix(reinterpret_cast<float*>(&worldViewProj));
 		mTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
-		md3dImmediateContext->DrawIndexed(mGridIndexCount, 0, 0);
+		md3dImmediateContext->DrawIndexed(mSkullIndexCount, 0, 0);
 	}
 
 	HR(mSwapChain->Present(0, 0));
 }
 
-void HillsApp::OnMouseDown(WPARAM btnState, int x, int y)
+void SkullApp::OnMouseDown(WPARAM btnState, int x, int y)
 {
 	mLastMousePos.x = x;
 	mLastMousePos.y = y;
@@ -107,12 +109,12 @@ void HillsApp::OnMouseDown(WPARAM btnState, int x, int y)
 	SetCapture(mhMainWnd);
 }
 
-void HillsApp::OnMouseUp(WPARAM btnState, int x, int y)
+void SkullApp::OnMouseUp(WPARAM btnState, int x, int y)
 {
-	ReleaseCapture(); 
+	ReleaseCapture();
 }
 
-void HillsApp::OnMouseMove(WPARAM btnState, int x, int y)
+void SkullApp::OnMouseMove(WPARAM btnState, int x, int y)
 {
 	if ((btnState & MK_LBUTTON) != 0)
 	{
@@ -130,66 +132,67 @@ void HillsApp::OnMouseMove(WPARAM btnState, int x, int y)
 	else if ((btnState & MK_RBUTTON) != 0)
 	{
 		// Make each pixel correspond to 0.2 unit in the scene.
-		float dx = 0.2f*static_cast<float>(x - mLastMousePos.x);
-		float dy = 0.2f*static_cast<float>(y - mLastMousePos.y);
+		float dx = 0.05f*static_cast<float>(x - mLastMousePos.x);
+		float dy = 0.05f*static_cast<float>(y - mLastMousePos.y);
 
 		// Update the camera radius based on input.
 		mRadius += dx - dy;
 
 		// Restrict the radius.
-		mRadius = MathHelper::Clamp(mRadius, 50.0f, 500.0f);
+		mRadius = MathHelper::Clamp(mRadius, 5.0f, 50.0f);
 	}
 
 	mLastMousePos.x = x;
 	mLastMousePos.y = y;
 }
 
-void HillsApp::BuildGeometryBuffers()
-{
-	GeometryGenerator::MeshData grid;
-	GeometryGenerator geoGen;
-	geoGen.CreateGrid(160.0f, 160.0f, 50, 50, grid);
-
-	mGridIndexCount = grid.Indices.size();
-
-	std::vector<Vertex> vertices(grid.Vertices.size());
-	for (size_t i = 0; i < grid.Vertices.size(); ++i)
+void SkullApp::BuildGeometryBuffers()
+{ 
+	std::ifstream fin("../Models/skull.txt");
+	if (!fin)
 	{
-		XMFLOAT3 p = grid.Vertices[i].Position;
-		p.y = GetHeight(p.x, p.z);
-		vertices[i].Pos = p;
-
-		// Color the vertex based on its height.
-		if (p.y < -10.0f)
-		{
-			// Sandy beach color.
-			vertices[i].Color = XMFLOAT4(1.0f, 0.96f, 0.62f, 1.0f);
-		}
-		else if (p.y < 5.0f)
-		{
-			// Light yellow-green.
-			vertices[i].Color = XMFLOAT4(0.48f, 0.77f, 0.46f, 1.0f);
-		}
-		else if (p.y < 12.0f)
-		{
-			// Dark yellow-green.
-			vertices[i].Color = XMFLOAT4(0.1f, 0.48f, 0.19f, 1.0f);
-		}
-		else if (p.y < 20.0f)
-		{
-			// Dark brown.
-			vertices[i].Color = XMFLOAT4(0.45f, 0.39f, 0.34f, 1.0f);
-		}
-		else
-		{
-			// White snow.
-			vertices[i].Color = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-		}
+		MessageBox(0, L"Models/skull.txt not found.", 0, 0);
+		return;
 	}
+	UINT vcount = 0;
+	UINT tcount = 0;
+	std::string ignore;
+
+	fin >> ignore >> vcount;
+	fin >> ignore >> tcount;
+	fin >> ignore >> ignore >> ignore >> ignore;
+
+	float nx, ny, nz;
+	XMFLOAT4 black(0.0f, 0.0f, 0.0f, 1.0f);
+
+	std::vector<Vertex> vertices(vcount);
+	for (UINT i = 0; i < vcount; ++i)
+	{
+		fin >> vertices[i].Pos.x >> vertices[i].Pos.y >> vertices[i].Pos.z;
+
+		vertices[i].Color = black;
+
+		// Normal not used in this demo.
+		fin >> nx >> ny >> nz;
+	}
+
+	fin >> ignore;
+	fin >> ignore;
+	fin >> ignore;
+
+	mSkullIndexCount = 3 * tcount;
+	std::vector<UINT> indices(mSkullIndexCount);
+	for (UINT i = 0; i < tcount; ++i)
+	{
+		fin >> indices[i * 3 + 0] >> indices[i * 3 + 1] >> indices[i * 3 + 2];
+	}
+
+	fin.close();
+
 	D3D11_BUFFER_DESC vbd;
 	ZeroMemory(&vbd, sizeof(D3D11_BUFFER_DESC));
 	vbd.Usage = D3D11_USAGE_IMMUTABLE;
-	vbd.ByteWidth = sizeof(Vertex) * grid.Vertices.size();
+	vbd.ByteWidth = sizeof(Vertex) * vcount;
 	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	D3D11_SUBRESOURCE_DATA vinitData;
 	vinitData.pSysMem = &vertices[0];
@@ -198,22 +201,20 @@ void HillsApp::BuildGeometryBuffers()
 	D3D11_BUFFER_DESC ibd;
 	ZeroMemory(&ibd, sizeof(D3D11_BUFFER_DESC));
 	ibd.Usage = D3D11_USAGE_IMMUTABLE;
-	ibd.ByteWidth = sizeof(UINT) * mGridIndexCount;
+	ibd.ByteWidth = sizeof(UINT) * mSkullIndexCount;
 	ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
 	D3D11_SUBRESOURCE_DATA iinitData;
-	iinitData.pSysMem = &grid.Indices[0];
+	iinitData.pSysMem = &indices[0];
 	HR(md3dDevice->CreateBuffer(&ibd, &iinitData, &mIB));
 }
 
-void HillsApp::BuildFX()
+void SkullApp::BuildFX()
 {
 	std::ifstream fin("../Fx/Color.fxo", std::ios::binary);
-
 	fin.seekg(0, std::ios_base::end);
 	int size = (int)fin.tellg();
 	fin.seekg(0, std::ios_base::beg);
 	std::vector<char> compiledShader(size);
-
 	fin.read(&compiledShader[0], size);
 	fin.close();
 
@@ -221,11 +222,12 @@ void HillsApp::BuildFX()
 		0, md3dDevice, &mFX));
 
 	mTech = mFX->GetTechniqueByName("ColorTech");
-	mfxWorldViewProj = mFX->GetVariableByName("gWorldViewProj")->AsMatrix(); 
+	mfxWorldViewProj = mFX->GetVariableByName("gWorldViewProj")->AsMatrix();
 }
 
-void HillsApp::BuildVertexLayout()
+void SkullApp::BuildVertexLayout()
 {
+	// Create the vertex input layout.
 	D3D11_INPUT_ELEMENT_DESC vertexDesc[] =
 	{
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
@@ -239,7 +241,14 @@ void HillsApp::BuildVertexLayout()
 		passDesc.IAInputSignatureSize, &mInputLayout));
 }
 
-float HillsApp::GetHeight(float x, float z) const
+void SkullApp::BuildRasterizerState()
 {
-	return 0.3f*(z*sinf(0.1f*x) + x*cosf(0.1f*z)); 
+	D3D11_RASTERIZER_DESC wireframeDesc;
+	ZeroMemory(&wireframeDesc, sizeof(D3D11_RASTERIZER_DESC));
+	wireframeDesc.FillMode = D3D11_FILL_WIREFRAME;
+	wireframeDesc.CullMode = D3D11_CULL_BACK;
+	wireframeDesc.FrontCounterClockwise = false;
+	wireframeDesc.DepthClipEnable = true;
+
+	HR(md3dDevice->CreateRasterizerState(&wireframeDesc, &mWireframeRS));
 }

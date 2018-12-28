@@ -15,12 +15,9 @@
 
 #include <wrl/client.h>
 
-
 #include "DxErr.h"
-#include "d3dx11effect.h"
-
+#include "d3dx11effect.h" 
 #include "MathHelper.h"
-
 
 /*
 #include "d3dx11Effect.h"

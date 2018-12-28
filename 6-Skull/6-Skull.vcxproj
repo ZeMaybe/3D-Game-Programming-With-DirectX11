@@ -19,9 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{A6B6239D-44C9-4197-AF3F-EA6BF583E6A0}</ProjectGuid>
+    <ProjectGuid>{6770AB17-24C7-4521-881B-BF41B3E72CFC}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>My6Hills</RootNamespace>
+    <RootNamespace>My6Skull</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -151,18 +151,19 @@
     <ClCompile Include="..\Common\GameTimer.cpp" />
     <ClCompile Include="..\Common\GeometryGenerator.cpp" />
     <ClCompile Include="..\Common\MathHelper.cpp" />
-    <ClCompile Include="Hills.cpp" />
-    <ClCompile Include="HillsApp.cpp" />
+    <ClCompile Include="Skull.cpp" />
+    <ClCompile Include="SkullApp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Common\D3DApp.h" />
     <ClInclude Include="..\Common\D3DUtil.h" />
     <ClInclude Include="..\Common\d3dx11effect.h" />
+    <ClInclude Include="..\Common\d3dxGlobal.h" />
     <ClInclude Include="..\Common\DxErr.h" />
     <ClInclude Include="..\Common\GameTimer.h" />
     <ClInclude Include="..\Common\GeometryGenerator.h" />
     <ClInclude Include="..\Common\MathHelper.h" />
-    <ClInclude Include="HillsApp.h" />
+    <ClInclude Include="SkullApp.h" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\FX\Color.fx">
