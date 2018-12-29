@@ -9,6 +9,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Init Direct3D", "Init Direc
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "6-Box", "6-Box\6-Box.vcxproj", "{4A8FA2D7-2DC4-4155-9493-1F237D223E58}"
+	ProjectSection(ProjectDependencies) = postProject
+		{ABA15DA6-9C57-4C1E-A3A5-CA563B9BFA5A} = {ABA15DA6-9C57-4C1E-A3A5-CA563B9BFA5A}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "6-Hills", "6-Hills\6-Hills.vcxproj", "{A6B6239D-44C9-4197-AF3F-EA6BF583E6A0}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -26,6 +29,16 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "6-Skull", "6-Skull\6-Skull.
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CommonLib", "CommonLib\CommonLib.vcxproj", "{ABA15DA6-9C57-4C1E-A3A5-CA563B9BFA5A}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lighting", "Lighting\Lighting.vcxproj", "{604CD0D7-8491-4026-AACB-8E85A576E87F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{ABA15DA6-9C57-4C1E-A3A5-CA563B9BFA5A} = {ABA15DA6-9C57-4C1E-A3A5-CA563B9BFA5A}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LitSkull", "LitSkull\LitSkull.vcxproj", "{766EB193-DF9C-449A-BEDF-F34DF4827A6F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{ABA15DA6-9C57-4C1E-A3A5-CA563B9BFA5A} = {ABA15DA6-9C57-4C1E-A3A5-CA563B9BFA5A}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -83,6 +96,22 @@ Global
 		{ABA15DA6-9C57-4C1E-A3A5-CA563B9BFA5A}.Release|x64.Build.0 = Release|x64
 		{ABA15DA6-9C57-4C1E-A3A5-CA563B9BFA5A}.Release|x86.ActiveCfg = Release|Win32
 		{ABA15DA6-9C57-4C1E-A3A5-CA563B9BFA5A}.Release|x86.Build.0 = Release|Win32
+		{604CD0D7-8491-4026-AACB-8E85A576E87F}.Debug|x64.ActiveCfg = Debug|x64
+		{604CD0D7-8491-4026-AACB-8E85A576E87F}.Debug|x64.Build.0 = Debug|x64
+		{604CD0D7-8491-4026-AACB-8E85A576E87F}.Debug|x86.ActiveCfg = Debug|Win32
+		{604CD0D7-8491-4026-AACB-8E85A576E87F}.Debug|x86.Build.0 = Debug|Win32
+		{604CD0D7-8491-4026-AACB-8E85A576E87F}.Release|x64.ActiveCfg = Release|x64
+		{604CD0D7-8491-4026-AACB-8E85A576E87F}.Release|x64.Build.0 = Release|x64
+		{604CD0D7-8491-4026-AACB-8E85A576E87F}.Release|x86.ActiveCfg = Release|Win32
+		{604CD0D7-8491-4026-AACB-8E85A576E87F}.Release|x86.Build.0 = Release|Win32
+		{766EB193-DF9C-449A-BEDF-F34DF4827A6F}.Debug|x64.ActiveCfg = Debug|x64
+		{766EB193-DF9C-449A-BEDF-F34DF4827A6F}.Debug|x64.Build.0 = Debug|x64
+		{766EB193-DF9C-449A-BEDF-F34DF4827A6F}.Debug|x86.ActiveCfg = Debug|Win32
+		{766EB193-DF9C-449A-BEDF-F34DF4827A6F}.Debug|x86.Build.0 = Debug|Win32
+		{766EB193-DF9C-449A-BEDF-F34DF4827A6F}.Release|x64.ActiveCfg = Release|x64
+		{766EB193-DF9C-449A-BEDF-F34DF4827A6F}.Release|x64.Build.0 = Release|x64
+		{766EB193-DF9C-449A-BEDF-F34DF4827A6F}.Release|x86.ActiveCfg = Release|Win32
+		{766EB193-DF9C-449A-BEDF-F34DF4827A6F}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

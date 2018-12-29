@@ -26,12 +26,10 @@ HillsApp::~HillsApp()
 {
 	ReleaseCOM(mVB);
 	ReleaseCOM(mIB);
-	ReleaseCOM(mFX);
 	ReleaseCOM(mInputLayout);
-
-	//ReleaseCOM(mTech);
-	ReleaseCOM(mfxWorldViewProj);
 	ReleaseCOM(mRasterizeStateWireFrame);
+
+	SafeDelete(mEffect);
 }
 
 bool HillsApp::Init(HINSTANCE hInstance)
@@ -40,7 +38,7 @@ bool HillsApp::Init(HINSTANCE hInstance)
 		return false;
 
 	BuildGeometryBuffers();
-	BuildFX();
+	mEffect = new PosColorEffect(md3dDevice, L"../FX/Color.fxo");
 	BuildVertexLayout();
 
 	return true;
@@ -88,12 +86,12 @@ void HillsApp::DrawScene()
 	md3dImmediateContext->IASetIndexBuffer(mIB, DXGI_FORMAT_R32_UINT, 0);
 
 	D3DX11_TECHNIQUE_DESC techDesc;
-	mTech->GetDesc(&techDesc);
+	mEffect->ColorTech->GetDesc(&techDesc);
 	for (UINT p = 0; p < techDesc.Passes; ++p)
 	{
 		// Draw the grid.
-		mfxWorldViewProj->SetMatrix(reinterpret_cast<float*>(&worldViewProj));
-		mTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
+		mEffect->SetWorldViewProj(worldViewProj);
+		mEffect->ColorTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
 		md3dImmediateContext->DrawIndexed(mGridIndexCount, 0, 0);
 	}
 
@@ -205,26 +203,7 @@ void HillsApp::BuildGeometryBuffers()
 	iinitData.pSysMem = &grid.Indices[0];
 	HR(md3dDevice->CreateBuffer(&ibd, &iinitData, &mIB));
 }
-
-void HillsApp::BuildFX()
-{
-	std::ifstream fin("../Fx/Color.fxo", std::ios::binary);
-
-	fin.seekg(0, std::ios_base::end);
-	int size = (int)fin.tellg();
-	fin.seekg(0, std::ios_base::beg);
-	std::vector<char> compiledShader(size);
-
-	fin.read(&compiledShader[0], size);
-	fin.close();
-
-	HR(D3DX11CreateEffectFromMemory(&compiledShader[0], size,
-		0, md3dDevice, &mFX));
-
-	mTech = mFX->GetTechniqueByName("ColorTech");
-	mfxWorldViewProj = mFX->GetVariableByName("gWorldViewProj")->AsMatrix(); 
-}
-
+ 
 void HillsApp::BuildVertexLayout()
 {
 	D3D11_INPUT_ELEMENT_DESC vertexDesc[] =
@@ -235,7 +214,7 @@ void HillsApp::BuildVertexLayout()
 
 	// Create the input layout
 	D3DX11_PASS_DESC passDesc;
-	mTech->GetPassByIndex(0)->GetDesc(&passDesc);
+	mEffect->ColorTech->GetPassByIndex(0)->GetDesc(&passDesc);
 	HR(md3dDevice->CreateInputLayout(vertexDesc, 2, passDesc.pIAInputSignature,
 		passDesc.IAInputSignatureSize, &mInputLayout));
 }

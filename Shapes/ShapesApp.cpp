@@ -42,12 +42,10 @@ ShapesApp::~ShapesApp()
 {
 	ReleaseCOM(mVB);
 	ReleaseCOM(mIB);
-	ReleaseCOM(mFX);
 	ReleaseCOM(mInputLayout);
 	ReleaseCOM(mWireframeRS);
 
-	//ReleaseCOM(mTech);
-	//ReleaseCOM(mfxWorldViewProj);
+	SafeDelete(mEffect);
 }
 
 bool ShapesApp::Init(HINSTANCE hInstance)
@@ -56,7 +54,7 @@ bool ShapesApp::Init(HINSTANCE hInstance)
 		return false;
 
 	BuildGeometryBuffers();
-	BuildFX();
+	mEffect = new PosColorEffect(md3dDevice, L"../FX/Color.fxo");
 	BuildVertexLayout();
 	BuildRasterizerState(); 
 
@@ -105,33 +103,33 @@ void ShapesApp::DrawScene()
 	md3dImmediateContext->IASetIndexBuffer(mIB, DXGI_FORMAT_R32_UINT, 0);
 
 	D3DX11_TECHNIQUE_DESC techDesc;
-	mTech->GetDesc(&techDesc);
+	mEffect->ColorTech->GetDesc(&techDesc);
 	for (UINT p = 0; p < techDesc.Passes; ++p)
 	{
 		// Draw the grid.
 		XMMATRIX world = XMLoadFloat4x4(&mGridWorld);
-		mfxWorldViewProj->SetMatrix(reinterpret_cast<float*>(&(world*viewProj)));
-		mTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
+		mEffect->SetWorldViewProj(world*viewProj);
+		mEffect->ColorTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
 		md3dImmediateContext->DrawIndexed(mGridIndexCount, mGridIndexOffset, mGridVertexOffset);
 
 		// Draw the box.
 		world = XMLoadFloat4x4(&mBoxWorld);
-		mfxWorldViewProj->SetMatrix(reinterpret_cast<float*>(&(world*viewProj)));
-		mTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
+		mEffect->SetWorldViewProj(world*viewProj);
+		mEffect->ColorTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
 		md3dImmediateContext->DrawIndexed(mBoxIndexCount, mBoxIndexOffset, mBoxVertexOffset);
 
 		// Draw center sphere.
 		world = XMLoadFloat4x4(&mCenterSphereWorld);
-		mfxWorldViewProj->SetMatrix(reinterpret_cast<float*>(&(world*viewProj)));
-		mTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
+		mEffect->SetWorldViewProj(world*viewProj);
+		mEffect->ColorTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
 		md3dImmediateContext->DrawIndexed(mSphereIndexCount, mSphereIndexOffset, mSphereVertexOffset);
 
 		// Draw the cylinders.
 		for (int i = 0; i < 10; ++i)
 		{
 			world = XMLoadFloat4x4(&mCylWorld[i]);
-			mfxWorldViewProj->SetMatrix(reinterpret_cast<float*>(&(world*viewProj)));
-			mTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
+			mEffect->SetWorldViewProj(world*viewProj);
+			mEffect->ColorTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
 			md3dImmediateContext->DrawIndexed(mCylinderIndexCount, mCylinderIndexOffset, mCylinderVertexOffset);
 		}
 
@@ -139,8 +137,8 @@ void ShapesApp::DrawScene()
 		for (int i = 0; i < 10; ++i)
 		{
 			world = XMLoadFloat4x4(&mSphereWorld[i]);
-			mfxWorldViewProj->SetMatrix(reinterpret_cast<float*>(&(world*viewProj)));
-			mTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
+			mEffect->SetWorldViewProj(world*viewProj);
+			mEffect->ColorTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
 			md3dImmediateContext->DrawIndexed(mSphereIndexCount, mSphereIndexOffset, mSphereVertexOffset);
 		}
 	}
@@ -285,25 +283,6 @@ void ShapesApp::BuildGeometryBuffers()
 	HR(md3dDevice->CreateBuffer(&ibd, &iinitData, &mIB));
 }
 
-void ShapesApp::BuildFX()
-{
-	std::ifstream fin("../FX/Color.fxo", std::ios::binary);
-
-	fin.seekg(0, std::ios_base::end);
-	int size = (int)fin.tellg();
-	fin.seekg(0, std::ios_base::beg);
-	std::vector<char> compiledShader(size);
-
-	fin.read(&compiledShader[0], size);
-	fin.close();
-
-	HR(D3DX11CreateEffectFromMemory(&compiledShader[0], size,
-		0, md3dDevice, &mFX));
-
-	mTech = mFX->GetTechniqueByName("ColorTech");
-	mfxWorldViewProj = mFX->GetVariableByName("gWorldViewProj")->AsMatrix();
-}
-
 void ShapesApp::BuildVertexLayout()
 {
 	// Create the vertex input layout.
@@ -315,7 +294,7 @@ void ShapesApp::BuildVertexLayout()
 
 	// Create the input layout
 	D3DX11_PASS_DESC passDesc;
-	mTech->GetPassByIndex(0)->GetDesc(&passDesc);
+	mEffect->ColorTech->GetPassByIndex(0)->GetDesc(&passDesc);
 	HR(md3dDevice->CreateInputLayout(vertexDesc, 2, passDesc.pIAInputSignature,
 		passDesc.IAInputSignatureSize, &mInputLayout));
 }

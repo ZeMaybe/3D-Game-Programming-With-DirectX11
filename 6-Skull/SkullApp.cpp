@@ -28,11 +28,10 @@ SkullApp::~SkullApp()
 {
 	ReleaseCOM(mVB);
 	ReleaseCOM(mIB);
-	ReleaseCOM(mFX);
 	ReleaseCOM(mInputLayout);
 	ReleaseCOM(mWireframeRS);
-	ReleaseCOM(mTech);
-	ReleaseCOM(mfxWorldViewProj);
+
+	SafeDelete(mEffect);
 }
 
 bool SkullApp::Init(HINSTANCE hInstance)
@@ -41,7 +40,7 @@ bool SkullApp::Init(HINSTANCE hInstance)
 		return false;
 
 	BuildGeometryBuffers();
-	BuildFX();
+	mEffect = new PosColorEffect(md3dDevice, L"../FX/Color.fxo");
 	BuildVertexLayout();
 	BuildRasterizerState();
 
@@ -84,7 +83,7 @@ void SkullApp::DrawScene()
 	XMMATRIX proj = XMLoadFloat4x4(&mProj);
 	XMMATRIX world = XMLoadFloat4x4(&mSkullWorld);
 	XMMATRIX worldViewProj = world*view*proj;
-	mfxWorldViewProj->SetMatrix(reinterpret_cast<float*>(&worldViewProj));
+	mEffect->SetWorldViewProj(worldViewProj);
 
 	UINT stride = sizeof(Vertex);
 	UINT offset = 0;
@@ -92,10 +91,10 @@ void SkullApp::DrawScene()
 	md3dImmediateContext->IASetIndexBuffer(mIB, DXGI_FORMAT_R32_UINT, 0);
 
 	D3DX11_TECHNIQUE_DESC techDesc;
-	mTech->GetDesc(&techDesc);
+	mEffect->ColorTech->GetDesc(&techDesc);
 	for (UINT p = 0; p < techDesc.Passes; ++p)
 	{
-		mTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
+		mEffect->ColorTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
 		md3dImmediateContext->DrawIndexed(mSkullIndexCount, 0, 0);
 	}
 
@@ -209,23 +208,6 @@ void SkullApp::BuildGeometryBuffers()
 	HR(md3dDevice->CreateBuffer(&ibd, &iinitData, &mIB));
 }
 
-void SkullApp::BuildFX()
-{
-	std::ifstream fin("../Fx/Color.fxo", std::ios::binary);
-	fin.seekg(0, std::ios_base::end);
-	int size = (int)fin.tellg();
-	fin.seekg(0, std::ios_base::beg);
-	std::vector<char> compiledShader(size);
-	fin.read(&compiledShader[0], size);
-	fin.close();
-
-	HR(D3DX11CreateEffectFromMemory(&compiledShader[0], size,
-		0, md3dDevice, &mFX));
-
-	mTech = mFX->GetTechniqueByName("ColorTech");
-	mfxWorldViewProj = mFX->GetVariableByName("gWorldViewProj")->AsMatrix();
-}
-
 void SkullApp::BuildVertexLayout()
 {
 	// Create the vertex input layout.
@@ -237,7 +219,7 @@ void SkullApp::BuildVertexLayout()
 
 	// Create the input layout
 	D3DX11_PASS_DESC passDesc;
-	mTech->GetPassByIndex(0)->GetDesc(&passDesc);
+	mEffect->ColorTech->GetPassByIndex(0)->GetDesc(&passDesc);
 	HR(md3dDevice->CreateInputLayout(vertexDesc, 2, passDesc.pIAInputSignature,
 		passDesc.IAInputSignatureSize, &mInputLayout));
 }

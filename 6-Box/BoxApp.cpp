@@ -26,11 +26,10 @@ BoxApp::~BoxApp()
 	ReleaseCOM(mBoxVB);
 	ReleaseCOM(mBoxIB);
 
-	ReleaseCOM(mFx);
+
 	ReleaseCOM(mInputLayout);
 
-	//ReleaseCOM(mTech);
-	//ReleaseCOM(mfxWorldViewProj);
+	SafeDelete(mEffect);
 }
 
 bool BoxApp::Init(HINSTANCE hinst)
@@ -39,7 +38,7 @@ bool BoxApp::Init(HINSTANCE hinst)
 		return false;
 
 	BuildGeometryBuffers();
-	BuildFX();
+	mEffect = new PosColorEffect(md3dDevice, L"../FX/Color.fxo");
 	BuildVertexLayout();
 
 	return true;
@@ -89,14 +88,15 @@ void BoxApp::DrawScene()
 	md3dImmediateContext->IASetVertexBuffers(0, 1, &mBoxVB, &stride, &offset);
 	md3dImmediateContext->IASetIndexBuffer(mBoxIB, DXGI_FORMAT_R32_UINT, 0);
 
-	mfxWorldViewProj->SetMatrix(reinterpret_cast<float*>(&worldViewProj));
-	//mfxWorldViewProj->SetMatrixTranspose(reinterpret_cast<float*>(&worldViewProj));
+	//mfxWorldViewProj->SetMatrix(reinterpret_cast<float*>(&worldViewProj));
+	mEffect->SetWorldViewProj(worldViewProj);
 
 	D3DX11_TECHNIQUE_DESC techDesc;
-	mTech->GetDesc(&techDesc);
+	mEffect->ColorTech->GetDesc(&techDesc);
+	//mTech->GetDesc(&techDesc);
 	for (UINT p = 0; p < techDesc.Passes; ++p)
 	{
-		mTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
+		mEffect->ColorTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
 
 		md3dImmediateContext->DrawIndexed(36, 0, 0);
 	}
@@ -215,42 +215,7 @@ void BoxApp::BuildGeometryBuffers()
 	D3D11_SUBRESOURCE_DATA iinitData;
 	iinitData.pSysMem = indices;
 	HR(md3dDevice->CreateBuffer(&ibd, &iinitData, &mBoxIB));
-}
-
-void BoxApp::BuildFX()
-{
-	DWORD shaderFlags = 0;
-#if defined(DEBUG) || defined(_DEBUG)
-	shaderFlags |= D3DCOMPILE_DEBUG;
-	shaderFlags |= D3DCOMPILE_SKIP_OPTIMIZATION;
-#endif
-
-	ID3DBlob* compiledShader = 0;
-	ID3DBlob* compilationMsgs = 0;
-
-	HRESULT hr = D3DCompileFromFile(L"../FX/Color.fx", 0, 0, 0, "fx_5_0", shaderFlags, 0, &compiledShader, &compilationMsgs);
-
-	if (compilationMsgs != 0)
-	{
-		//MessageBoxA(0,(char*)compilationMsgs->GetBufferPointer(),0,0);
-	}
-
-	if (FAILED(hr))
-	{
-		DXTrace(__FILEW__, (DWORD)__LINE__, hr, L"D3DCompileFromFile", true);
-	}
- 
-	HR(D3DX11CreateEffectFromMemory(compiledShader->GetBufferPointer(), compiledShader->GetBufferSize(), 0, md3dDevice, &mFx));
-
-	ReleaseCOM(compiledShader);
-	ReleaseCOM(compilationMsgs);
-
-	mTech = mFx->GetTechniqueByName("ColorTech");
-	mfxWorldViewProj = mFx->GetVariableByName("gWorldViewProj")->AsMatrix();
-
-	assert(mTech->IsValid());
-	assert(mfxWorldViewProj->IsValid());
-}
+} 
 
 void BoxApp::BuildVertexLayout()
 {
@@ -261,7 +226,7 @@ void BoxApp::BuildVertexLayout()
 	};
 
 	D3DX11_PASS_DESC passDesc;
-	mTech->GetPassByIndex(0)->GetDesc(&passDesc);
+	mEffect->ColorTech->GetPassByIndex(0)->GetDesc(&passDesc);
 
 	HR(md3dDevice->CreateInputLayout(vertexDesc, 2, passDesc.pIAInputSignature, passDesc.IAInputSignatureSize, &mInputLayout));
 }

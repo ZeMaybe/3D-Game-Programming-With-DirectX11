@@ -3,6 +3,7 @@
 #define BoxApp_h__
 
 #include "D3DApp.h"
+#include "Effects.h"
 
 struct Vertex
 {
@@ -27,17 +28,13 @@ public:
 
 private:
 	void BuildGeometryBuffers();
-	void BuildFX();
 	void BuildVertexLayout();
 
 private:
 	ID3D11Buffer* mBoxVB = 0;
 	ID3D11Buffer* mBoxIB = 0;
 
-	ID3DX11Effect* mFx = 0;
-	ID3DX11EffectTechnique* mTech = 0;
-	ID3DX11EffectMatrixVariable* mfxWorldViewProj = 0;
-
+	PosColorEffect* mEffect = 0;
 	ID3D11InputLayout* mInputLayout = 0;
 
 	DirectX::XMFLOAT4X4 mWorld;

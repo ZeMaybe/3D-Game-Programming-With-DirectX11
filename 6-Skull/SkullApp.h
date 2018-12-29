@@ -3,6 +3,7 @@
 #define SkullApp_h__
 
 #include "D3DApp.h"
+#include "Effects.h"
 
 struct Vertex
 {
@@ -27,7 +28,6 @@ public:
 
 private:
 	void BuildGeometryBuffers();
-	void BuildFX();
 	void BuildVertexLayout();
 	void BuildRasterizerState();
 
@@ -35,9 +35,7 @@ private:
 	ID3D11Buffer* mVB =0;
 	ID3D11Buffer* mIB =0;
 
-	ID3DX11Effect* mFX=0;
-	ID3DX11EffectTechnique* mTech=0;
-	ID3DX11EffectMatrixVariable* mfxWorldViewProj=0;
+	PosColorEffect* mEffect =0;
 
 	ID3D11InputLayout* mInputLayout=0;
 
