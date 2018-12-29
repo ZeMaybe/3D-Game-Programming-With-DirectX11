@@ -68,11 +68,13 @@ BasicDirLightsEffect::~BasicDirLightsEffect()
 void Effects::InitAll(ID3D11Device* device)
 {
 	BasicDirLightsFX = new BasicDirLightsEffect(device, L"../FX/BasicDirLights.fxo");
+	DirPointSpotLightsFX = new DirPointSpotLightsEffect(device, L"../FX/DirPointSpotLights.fxo");
 }
 
 void Effects::DestroyAll()
 {
 	SafeDelete(BasicDirLightsFX);
+	SafeDelete(DirPointSpotLightsFX);
 
 	//for (size_t i = 0; i < mEffects.size(); ++i)
 	//{
@@ -81,6 +83,8 @@ void Effects::DestroyAll()
 } 
 
 BasicDirLightsEffect* Effects::BasicDirLightsFX = 0;
+
+DirPointSpotLightsEffect* Effects::DirPointSpotLightsFX = 0 ;
 
 //std::vector<Effect*> Effects::mEffects;
 
@@ -98,4 +102,41 @@ PosColorEffect::~PosColorEffect()
 {
 	ReleaseCOM(ColorTech);
 	ReleaseCOM(WorldViewProj);
+}
+
+DirPointSpotLightsEffect::DirPointSpotLightsEffect(ID3D11Device* device, const std::wstring& fileName)
+	:Effect(device,fileName)
+{
+	LightTech = mFX->GetTechniqueByName("LightTech");
+	WorldViewProj = mFX->GetVariableByName("gWorldViewProj")->AsMatrix();
+	World = mFX->GetVariableByName("gWorld")->AsMatrix();
+	WorldInvTranspose = mFX->GetVariableByName("gWorldInvTranspose")->AsMatrix();
+	EyePosW = mFX->GetVariableByName("gEyePosW")->AsVector();
+	DirLit = mFX->GetVariableByName("gDirLight");
+	PointLit = mFX->GetVariableByName("gPointLight");
+	SpotLit = mFX->GetVariableByName("gSpotLight");
+	Mat = mFX->GetVariableByName("gMaterial");
+
+	assert(LightTech->IsValid());
+	assert(WorldViewProj->IsValid());
+	assert(World->IsValid());
+	assert(WorldInvTranspose->IsValid());
+	assert(EyePosW->IsValid());
+	assert(DirLit->IsValid());
+	assert(PointLit->IsValid());
+	assert(SpotLit->IsValid());
+	assert(Mat->IsValid()); 
+}
+
+DirPointSpotLightsEffect::~DirPointSpotLightsEffect()
+{
+	ReleaseCOM(LightTech);
+	ReleaseCOM(WorldViewProj);
+	ReleaseCOM(World);
+	ReleaseCOM(WorldInvTranspose);
+	ReleaseCOM(EyePosW);
+	ReleaseCOM(DirLit);
+	ReleaseCOM(PointLit);
+	ReleaseCOM(SpotLit);
+	ReleaseCOM(Mat);
 }

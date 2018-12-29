@@ -62,6 +62,34 @@ public:
 	ID3DX11EffectVariable* Mat=0;
 };
 
+
+class DirPointSpotLightsEffect : public Effect
+{
+public:
+	DirPointSpotLightsEffect(ID3D11Device* device, const std::wstring& fileName);
+	~DirPointSpotLightsEffect();
+
+	void SetWorldViewProj(DirectX::CXMMATRIX M) { WorldViewProj->SetMatrix(reinterpret_cast<const float*>(&M)); }
+	void SetWorld(DirectX::CXMMATRIX M) { World->SetMatrix(reinterpret_cast<const float*>(&M)); }
+	void SetWorldInvTranspose(DirectX::CXMMATRIX M) { WorldInvTranspose->SetMatrix(reinterpret_cast<const float*>(&M)); }
+	void SetEyePosW(const DirectX::XMFLOAT3& v) { EyePosW->SetRawValue(&v, 0, sizeof(DirectX::XMFLOAT3)); }
+	void SetMaterial(const Material& mat) { Mat->SetRawValue(&mat, 0, sizeof(Material)); }
+	void SetDirLit(const DirectionalLight& lit) { DirLit->SetRawValue(&lit, 0, sizeof(DirectionalLight)); }
+	void SetPointLit(const PointLight& lit) { PointLit->SetRawValue(&lit, 0, sizeof(PointLight)); }
+	void SetSpotLit(const SpotLight& lit) { SpotLit->SetRawValue(&lit, 0, sizeof(SpotLight)); } 
+
+	ID3DX11EffectTechnique* LightTech = 0;
+
+	ID3DX11EffectMatrixVariable* WorldViewProj = 0;
+	ID3DX11EffectMatrixVariable* World = 0;
+	ID3DX11EffectMatrixVariable* WorldInvTranspose = 0;
+	ID3DX11EffectVectorVariable* EyePosW = 0;
+	ID3DX11EffectVariable* DirLit = 0;
+	ID3DX11EffectVariable* PointLit = 0;
+	ID3DX11EffectVariable* SpotLit = 0;
+	ID3DX11EffectVariable* Mat = 0;
+};
+
 class Effects
 {
 public:
@@ -72,6 +100,7 @@ public:
 	//static T* InitEffect(ID3D11Device* device, std::wstring filename);
 
 	static BasicDirLightsEffect* BasicDirLightsFX;
+	static DirPointSpotLightsEffect* DirPointSpotLightsFX;
 
 private:
 	//static std::vector<Effect*> mEffects;

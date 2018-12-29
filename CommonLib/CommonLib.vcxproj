@@ -148,6 +148,7 @@ copy "$(targetdir)$(targetname).pdb" "$(solutiondir)lib\$(targetname).pdb"</Comm
     <ClCompile Include="LightHelper.cpp" />
     <ClCompile Include="MathHelper.cpp" />
     <ClCompile Include="Vertex.cpp" />
+    <ClCompile Include="Waves.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Common\D3DApp.h" />
@@ -161,6 +162,7 @@ copy "$(targetdir)$(targetname).pdb" "$(solutiondir)lib\$(targetname).pdb"</Comm
     <ClInclude Include="..\Common\LightHelper.h" />
     <ClInclude Include="..\Common\MathHelper.h" />
     <ClInclude Include="..\Common\Vertex.h" />
+    <ClInclude Include="..\Common\Waves.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
