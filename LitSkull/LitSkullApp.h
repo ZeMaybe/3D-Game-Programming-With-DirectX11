@@ -4,6 +4,7 @@
 #include "D3DApp.h"
 #include "LightHelper.h"
 #include "Effects.h"
+#include "Vertex.h"
 
 class LitSkullApp :public D3DApp
 {
@@ -47,7 +48,9 @@ private:
 	DirectX::XMFLOAT4X4 mView;
 	DirectX::XMFLOAT4X4 mProj;
 
-	BasicDirLightsEffect* mEffect;
+	BasicDirLightsEffect* mEffect =0;
+	ID3D11InputLayout* mLayout = 0;
+	InputLayouts mLayouts;
 
 	int mBoxVertexOffset;
 	int mGridVertexOffset;

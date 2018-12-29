@@ -4,12 +4,8 @@
 
 #include "D3DApp.h"
 #include "Effects.h"
+#include "Vertex.h"
 
-struct Vertex
-{
-	DirectX::XMFLOAT3 Pos;
-	DirectX::XMFLOAT4 Color;
-};
 
 class BoxApp :public D3DApp
 {
@@ -28,7 +24,6 @@ public:
 
 private:
 	void BuildGeometryBuffers();
-	void BuildVertexLayout();
 
 private:
 	ID3D11Buffer* mBoxVB = 0;
@@ -36,6 +31,7 @@ private:
 
 	PosColorEffect* mEffect = 0;
 	ID3D11InputLayout* mInputLayout = 0;
+	InputLayouts mInputLayouts;
 
 	DirectX::XMFLOAT4X4 mWorld;
 	DirectX::XMFLOAT4X4 mView;

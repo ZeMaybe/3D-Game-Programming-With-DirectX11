@@ -5,13 +5,8 @@
 
 #include "D3DApp.h"
 #include "Effects.h"
-
-struct Vertex
-{
-	DirectX::XMFLOAT3 Pos;
-	DirectX::XMFLOAT4 Color;
-};
-
+#include "Vertex.h"
+ 
 class HillsApp : public D3DApp
 {
 
@@ -30,20 +25,16 @@ public:
 
 private:
 	void BuildGeometryBuffers();
-	void BuildVertexLayout();
 	float GetHeight(float x, float z)const;
-
 
 private:
 	ID3D11Buffer* mVB = 0;
 	ID3D11Buffer* mIB = 0;
 
-	//ID3DX11Effect* mFX = 0;
-	//ID3DX11EffectTechnique* mTech = 0;
-	//ID3DX11EffectMatrixVariable* mfxWorldViewProj = 0;
 	PosColorEffect* mEffect = 0;
 
 	ID3D11InputLayout* mInputLayout = 0;
+	InputLayouts mInputLayouts;
 	ID3D11RasterizerState* mRasterizeStateWireFrame = 0;
 
 	UINT mGridIndexCount = 0;

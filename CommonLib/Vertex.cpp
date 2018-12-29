@@ -1,54 +1,61 @@
 
 #include "Vertex.h"
-#include "D3DUtil.h"
+#include "D3DUtil.h" 
 
-const D3D11_INPUT_ELEMENT_DESC InputLayoutDesc::PosNormal[2] =
+ID3D11InputLayout* InputLayouts::InitLayout(ID3D11Device* device, ID3DX11EffectTechnique* tech, std::wstring layoutName)
 {
-	{"POSITION",0,DXGI_FORMAT_R32G32B32_FLOAT,0,0,D3D11_INPUT_PER_VERTEX_DATA,0},
-	{"NORMAL",0,DXGI_FORMAT_R32G32B32_FLOAT,0,12,D3D11_INPUT_PER_VERTEX_DATA,0}
-};
+	ID3D11InputLayout* re = 0;
+	
+	InputLayoutDesc* inputDesc = mLayoutFactory.GetLayoutDescByName(layoutName);
 
-const D3D11_INPUT_ELEMENT_DESC InputLayoutDesc::PosColor[2]=
-{
-	{ "POSITION",0,DXGI_FORMAT_R32G32B32_FLOAT,0,0,D3D11_INPUT_PER_VERTEX_DATA,0 },
-	{ "COLOR",0,DXGI_FORMAT_R32G32B32A32_FLOAT,0,12,D3D11_INPUT_PER_VERTEX_DATA,0 }
-};
+	if (inputDesc)
+	{
+		D3DX11_PASS_DESC passDesc;
+		tech->GetPassByIndex(0)->GetDesc(&passDesc);
+		HR(device->CreateInputLayout(inputDesc->mDesc, inputDesc->mSize,
+			passDesc.pIAInputSignature,
+			passDesc.IAInputSignatureSize, &re));
+	}
 
-
-//const D3D11_INPUT_ELEMENT_DESC* InputLayoutDesc::GetLayoutDescByName(const std::wstring& layoutName)
-//{
-//	if (mAllInputDesc.size() == 0)
-//		InitAllInputDesc();
-//
-//	return mAllInputDesc.at(layoutName);
-//}
-
-std::map<std::wstring,const D3D11_INPUT_ELEMENT_DESC*> InputLayoutDesc::mAllInputDesc;
-
-void InputLayoutDesc::InitAllInputDesc()
-{
-	mAllInputDesc.insert(std::pair<std::wstring, const D3D11_INPUT_ELEMENT_DESC*>(std::wstring(L"PosNormal"), &PosNormal[0]));
-	mAllInputDesc.insert(std::pair<std::wstring, const D3D11_INPUT_ELEMENT_DESC*>(std::wstring(L"PosColor"), &PosColor[0]));
+	return re;
 }
 
-ID3D11InputLayout* InputLayouts::PosNormal =0;
-
-ID3D11InputLayout* InputLayouts::PosColor =0;
-
-void InputLayouts::InitAll(ID3D11Device* device, ID3DX11EffectTechnique* tech)
+InputLayoutFactory::InputLayoutFactory()
 {
-	D3DX11_PASS_DESC passDesc;
-	tech->GetPassByIndex(0)->GetDesc(&passDesc);
-	HR(device->CreateInputLayout(InputLayoutDesc::PosNormal, 2, passDesc.pIAInputSignature, passDesc.IAInputSignatureSize, &PosNormal));
+	InitAllInputDesc();
 }
 
-void InputLayouts::DestroyAll()
+InputLayoutFactory::~InputLayoutFactory()
 {
-	ReleaseCOM(PosNormal);
-	ReleaseCOM(PosColor);
+	DestroyAllInputDesc();
 }
 
-//ID3D11InputLayout* InputLayouts::InitLayout(ID3D11Device* device, ID3DX11EffectTechnique* tech, std::wstring layoutName)
-//{
-//	
-//}
+InputLayoutDesc* InputLayoutFactory::GetLayoutDescByName(const std::wstring& layoutName)
+{
+	return mAllInputDesc.at(layoutName);
+}
+
+void InputLayoutFactory::DestroyAllInputDesc()
+{
+	auto it = mAllInputDesc.begin();
+	while (it != mAllInputDesc.end())
+	{
+		SafeDelete(it->second);
+		++it;
+	}
+	mAllInputDesc.clear();
+}
+
+void InputLayoutFactory::InitAllInputDesc()
+{
+	InputLayoutDesc* PosNormal = new InputLayoutDesc(L"PosNormal", 2);
+	PosNormal->mDesc[0] = { "POSITION",0,DXGI_FORMAT_R32G32B32_FLOAT,0,0,D3D11_INPUT_PER_VERTEX_DATA,0 };
+	PosNormal->mDesc[1] = { "NORMAL",0,DXGI_FORMAT_R32G32B32_FLOAT,0,12,D3D11_INPUT_PER_VERTEX_DATA,0 };
+
+	InputLayoutDesc* PosColor = new InputLayoutDesc(L"PosColor", 2);
+	PosColor->mDesc[0] = { "POSITION",0,DXGI_FORMAT_R32G32B32_FLOAT,0,0,D3D11_INPUT_PER_VERTEX_DATA,0 } ;
+	PosColor->mDesc[1] = { "COLOR",0,DXGI_FORMAT_R32G32B32A32_FLOAT,0,12,D3D11_INPUT_PER_VERTEX_DATA,0 };
+	
+	mAllInputDesc.insert(InputPair(PosNormal->mLayoutName,PosNormal));
+	mAllInputDesc.insert(InputPair(PosColor->mLayoutName, PosColor));
+}

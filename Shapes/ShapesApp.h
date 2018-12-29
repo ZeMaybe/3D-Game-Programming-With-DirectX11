@@ -4,13 +4,8 @@
 
 #include "D3DApp.h" 
 #include "Effects.h"
-
-struct Vertex
-{
-	DirectX::XMFLOAT3 Pos;
-	DirectX::XMFLOAT4 Color;
-};
-
+#include "Vertex.h"
+ 
 class ShapesApp : public D3DApp
 {
 public:
@@ -28,7 +23,6 @@ public:
 
 private:
 	void BuildGeometryBuffers();
-	void BuildVertexLayout();
 	void BuildRasterizerState();
 
 private:
@@ -37,6 +31,7 @@ private:
 
 	PosColorEffect* mEffect;
 	ID3D11InputLayout* mInputLayout =0;
+	InputLayouts mInputLayouts;
 	ID3D11RasterizerState* mWireframeRS =0;
 
 	// Define transformations from local spaces to world space.

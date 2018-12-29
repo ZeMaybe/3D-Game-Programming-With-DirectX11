@@ -39,7 +39,7 @@ bool HillsApp::Init(HINSTANCE hInstance)
 
 	BuildGeometryBuffers();
 	mEffect = new PosColorEffect(md3dDevice, L"../FX/Color.fxo");
-	BuildVertexLayout();
+	mInputLayout = mInputLayouts.InitLayout(md3dDevice, mEffect->ColorTech, L"PosColor");
 
 	return true;
 }
@@ -80,7 +80,7 @@ void HillsApp::DrawScene()
 	XMMATRIX world = XMLoadFloat4x4(&mGridWorld);
 	XMMATRIX worldViewProj = world*view*proj;
 
-	UINT stride = sizeof(Vertex);
+	UINT stride = sizeof(Vertex::PosColor);
 	UINT offset = 0;
 	md3dImmediateContext->IASetVertexBuffers(0, 1, &mVB, &stride, &offset);
 	md3dImmediateContext->IASetIndexBuffer(mIB, DXGI_FORMAT_R32_UINT, 0);
@@ -151,7 +151,7 @@ void HillsApp::BuildGeometryBuffers()
 
 	mGridIndexCount = grid.Indices.size();
 
-	std::vector<Vertex> vertices(grid.Vertices.size());
+	std::vector<Vertex::PosColor> vertices(grid.Vertices.size());
 	for (size_t i = 0; i < grid.Vertices.size(); ++i)
 	{
 		XMFLOAT3 p = grid.Vertices[i].Position;
@@ -188,7 +188,7 @@ void HillsApp::BuildGeometryBuffers()
 	D3D11_BUFFER_DESC vbd;
 	ZeroMemory(&vbd, sizeof(D3D11_BUFFER_DESC));
 	vbd.Usage = D3D11_USAGE_IMMUTABLE;
-	vbd.ByteWidth = sizeof(Vertex) * grid.Vertices.size();
+	vbd.ByteWidth = sizeof(Vertex::PosColor) * grid.Vertices.size();
 	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	D3D11_SUBRESOURCE_DATA vinitData;
 	vinitData.pSysMem = &vertices[0];
@@ -202,21 +202,6 @@ void HillsApp::BuildGeometryBuffers()
 	D3D11_SUBRESOURCE_DATA iinitData;
 	iinitData.pSysMem = &grid.Indices[0];
 	HR(md3dDevice->CreateBuffer(&ibd, &iinitData, &mIB));
-}
- 
-void HillsApp::BuildVertexLayout()
-{
-	D3D11_INPUT_ELEMENT_DESC vertexDesc[] =
-	{
-		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 }
-	};
-
-	// Create the input layout
-	D3DX11_PASS_DESC passDesc;
-	mEffect->ColorTech->GetPassByIndex(0)->GetDesc(&passDesc);
-	HR(md3dDevice->CreateInputLayout(vertexDesc, 2, passDesc.pIAInputSignature,
-		passDesc.IAInputSignatureSize, &mInputLayout));
 }
 
 float HillsApp::GetHeight(float x, float z) const

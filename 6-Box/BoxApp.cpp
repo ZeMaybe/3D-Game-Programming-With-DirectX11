@@ -26,9 +26,7 @@ BoxApp::~BoxApp()
 	ReleaseCOM(mBoxVB);
 	ReleaseCOM(mBoxIB);
 
-
-	ReleaseCOM(mInputLayout);
-
+	ReleaseCOM(mInputLayout); 
 	SafeDelete(mEffect);
 }
 
@@ -39,7 +37,7 @@ bool BoxApp::Init(HINSTANCE hinst)
 
 	BuildGeometryBuffers();
 	mEffect = new PosColorEffect(md3dDevice, L"../FX/Color.fxo");
-	BuildVertexLayout();
+	mInputLayout = mInputLayouts.InitLayout(md3dDevice, mEffect->ColorTech, L"PosColor");
 
 	return true;
 }
@@ -83,7 +81,7 @@ void BoxApp::DrawScene()
 	XMMATRIX proj = XMLoadFloat4x4(&mProj);
 	XMMATRIX worldViewProj = world * view*proj;
 
-	UINT stride = sizeof(Vertex);
+	UINT stride = sizeof(Vertex::PosColor);
 	UINT offset = 0;
 	md3dImmediateContext->IASetVertexBuffers(0, 1, &mBoxVB, &stride, &offset);
 	md3dImmediateContext->IASetIndexBuffer(mBoxIB, DXGI_FORMAT_R32_UINT, 0);
@@ -155,7 +153,7 @@ void BoxApp::OnMouseMove(WPARAM btnState, int x, int y)
 void BoxApp::BuildGeometryBuffers()
 {
 	// Create vertex buffer
-	Vertex vertices[] =
+	Vertex::PosColor vertices[] =
 	{
 		{ XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT4(Colors::White) },
 		{ XMFLOAT3(-1.0f, +1.0f, -1.0f), XMFLOAT4(Colors::Black) },
@@ -169,7 +167,7 @@ void BoxApp::BuildGeometryBuffers()
 
 	D3D11_BUFFER_DESC vbd;
 	vbd.Usage = D3D11_USAGE_IMMUTABLE;
-	vbd.ByteWidth = sizeof(Vertex) * 8;
+	vbd.ByteWidth = sizeof(Vertex::PosColor) * 8;
 	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	vbd.CPUAccessFlags = 0;
 	vbd.MiscFlags = 0;
@@ -215,18 +213,4 @@ void BoxApp::BuildGeometryBuffers()
 	D3D11_SUBRESOURCE_DATA iinitData;
 	iinitData.pSysMem = indices;
 	HR(md3dDevice->CreateBuffer(&ibd, &iinitData, &mBoxIB));
-} 
-
-void BoxApp::BuildVertexLayout()
-{
-	D3D11_INPUT_ELEMENT_DESC vertexDesc[] =
-	{
-		{"POSITION",0,DXGI_FORMAT_R32G32B32_FLOAT,0,0,D3D11_INPUT_PER_VERTEX_DATA,0},
-		{"COLOR",0,DXGI_FORMAT_R32G32B32A32_FLOAT,0,12,D3D11_INPUT_PER_VERTEX_DATA,0}
-	};
-
-	D3DX11_PASS_DESC passDesc;
-	mEffect->ColorTech->GetPassByIndex(0)->GetDesc(&passDesc);
-
-	HR(md3dDevice->CreateInputLayout(vertexDesc, 2, passDesc.pIAInputSignature, passDesc.IAInputSignatureSize, &mInputLayout));
-}
+}  

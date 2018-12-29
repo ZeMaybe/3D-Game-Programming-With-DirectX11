@@ -83,8 +83,8 @@ LitSkullApp::~LitSkullApp()
 	ReleaseCOM(mSkullVB);
 	ReleaseCOM(mSkullIB);
 
+	ReleaseCOM(mLayout);
 	SafeDelete(mEffect);
-	InputLayouts::DestroyAll();
 }
 
 bool LitSkullApp::Init(HINSTANCE hinst)
@@ -93,7 +93,7 @@ bool LitSkullApp::Init(HINSTANCE hinst)
 		return false;
 
 	mEffect = new BasicDirLightsEffect(md3dDevice, L"../FX/BasicDirLights.fxo");
-	InputLayouts::InitAll(md3dDevice,mEffect->Light1Tech);
+	mLayout = mLayouts.InitLayout(md3dDevice,mEffect->Light1Tech,L"PosNormal");
 
 	BuildShapeGeometryBuffers();
 	BuildSkullGeometryBuffers();
@@ -143,7 +143,7 @@ void LitSkullApp::UpdateScene(float dt)
 void LitSkullApp::DrawScene()
 {
 	D3DApp::DrawScene();
-	md3dImmediateContext->IASetInputLayout(InputLayouts::PosNormal);
+	md3dImmediateContext->IASetInputLayout(mLayout);
 	md3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	XMMATRIX view = XMLoadFloat4x4(&mView);

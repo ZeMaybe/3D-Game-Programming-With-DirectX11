@@ -6,6 +6,7 @@
 #include <DirectXMath.h>
 #include <d3d11.h>
 #include <string>
+#include <map>
 
 namespace Vertex
 {
@@ -25,16 +26,16 @@ namespace Vertex
 #include <map>
 
 
-struct InputLayouDesc
+struct InputLayoutDesc
 {
-	InputLayouDesc(const std::wstring& name, UINT s)
+	InputLayoutDesc(const std::wstring& name, UINT s)
 	{
 		mLayoutName = name;
 		mSize = s;
 		mDesc = new D3D11_INPUT_ELEMENT_DESC[mSize];
 	}
 
-	~InputLayouDesc()
+	~InputLayoutDesc()
 	{
 		delete[] mDesc;
 	}
@@ -44,34 +45,29 @@ struct InputLayouDesc
 	D3D11_INPUT_ELEMENT_DESC* mDesc;
 };
 
-
-
-
-class InputLayoutDesc
+typedef std::pair<std::wstring, InputLayoutDesc*> InputPair;
+class InputLayoutFactory
 {
 public:
-	static const D3D11_INPUT_ELEMENT_DESC PosNormal[2];
-
-	static const D3D11_INPUT_ELEMENT_DESC PosColor[2];
-
-	//static const D3D11_INPUT_ELEMENT_DESC* GetLayoutDescByName(const std::wstring& layoutName);
-
-	static std::map<std::wstring,const D3D11_INPUT_ELEMENT_DESC*> mAllInputDesc;
+	InputLayoutFactory();
+	~InputLayoutFactory();
+	InputLayoutDesc* GetLayoutDescByName(const std::wstring& layoutName);
 
 private:
-	static void InitAllInputDesc();
-};
-
+	void InitAllInputDesc();
+	void DestroyAllInputDesc();
+	std::map<std::wstring, InputLayoutDesc*> mAllInputDesc;
+}; 
+ 
 class InputLayouts
 {
 public:
-	static void InitAll(ID3D11Device* device,ID3DX11EffectTechnique* tech);
-	static void DestroyAll();
+	InputLayouts() {}
 
 	ID3D11InputLayout* InitLayout(ID3D11Device* device, ID3DX11EffectTechnique* tech, std::wstring layoutName);
 
-	static ID3D11InputLayout* PosNormal;
-	static ID3D11InputLayout* PosColor;
+private:
+	InputLayoutFactory mLayoutFactory;
 };
 
 
