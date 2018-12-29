@@ -5,9 +5,10 @@
 
 using namespace DirectX;
 
-SkullApp::SkullApp(HINSTANCE hInstance)
-	:D3DApp(hInstance)
-	,mTheta(1.5f*XM_PI)
+SkullApp theApp;
+
+SkullApp::SkullApp()
+	:mTheta(1.5f*XM_PI)
 	,mPhi(0.1f*XM_PI)
 	,mRadius(20.0f)
 {
@@ -34,9 +35,9 @@ SkullApp::~SkullApp()
 	ReleaseCOM(mfxWorldViewProj);
 }
 
-bool SkullApp::Init()
+bool SkullApp::Init(HINSTANCE hInstance)
 {
-	if (!D3DApp::Init())
+	if (!D3DApp::Init(hInstance))
 		return false;
 
 	BuildGeometryBuffers();

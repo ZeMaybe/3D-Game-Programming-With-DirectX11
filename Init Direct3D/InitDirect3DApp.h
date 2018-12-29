@@ -8,10 +8,10 @@
 class InitDirect3DApp : public D3DApp
 {
 public:
-	InitDirect3DApp(HINSTANCE hInstance);
+	InitDirect3DApp();
 	~InitDirect3DApp();
 
-	bool Init();
+	bool Init(HINSTANCE hinst);
 	void OnResize();
 	void UpdateScene(float dt);
 	void DrawScene();

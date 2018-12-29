@@ -95,7 +95,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(solutiondir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>d3d11.lib;Effects11d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;Effects11d.lib;commonlibd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -146,23 +146,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\Common\D3DApp.cpp" />
-    <ClCompile Include="..\Common\D3DUtil.cpp" />
-    <ClCompile Include="..\Common\dxerr.cpp" />
-    <ClCompile Include="..\Common\GameTimer.cpp" />
-    <ClCompile Include="..\Common\GeometryGenerator.cpp" />
-    <ClCompile Include="..\Common\MathHelper.cpp" />
-    <ClCompile Include="Shapes.cpp" />
     <ClCompile Include="ShapesApp.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Common\D3DApp.h" />
-    <ClInclude Include="..\Common\D3DUtil.h" />
-    <ClInclude Include="..\Common\d3dx11effect.h" />
-    <ClInclude Include="..\Common\DxErr.h" />
-    <ClInclude Include="..\Common\GameTimer.h" />
-    <ClInclude Include="..\Common\GeometryGenerator.h" />
-    <ClInclude Include="..\Common\MathHelper.h" />
     <ClInclude Include="ShapesApp.h" />
   </ItemGroup>
   <ItemGroup>

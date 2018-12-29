@@ -13,10 +13,10 @@ struct Vertex
 class SkullApp : public D3DApp
 {
 public:
-	SkullApp(HINSTANCE hInstance);
+	SkullApp();
 	~SkullApp();
 
-	bool Init();
+	bool Init(HINSTANCE hInstance);
 	void OnResize();
 	void UpdateScene(float dt);
 	void DrawScene();

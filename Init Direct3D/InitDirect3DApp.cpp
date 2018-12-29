@@ -1,20 +1,20 @@
 #include "InitDirect3DApp.h"
-
  
 
-InitDirect3DApp::InitDirect3DApp(HINSTANCE hInstance)
-	:D3DApp(hInstance)
-{
+InitDirect3DApp theApp;
 
+InitDirect3DApp::InitDirect3DApp()
+{
+	mMainWndCaption = L"InitDirect3DApp";
 }
 
 InitDirect3DApp::~InitDirect3DApp()
 {
 }
 
-bool InitDirect3DApp::Init()
+bool InitDirect3DApp::Init(HINSTANCE hinst)
 {
-	if (!D3DApp::Init())
+	if (!D3DApp::Init(hinst))
 		return false;
 
 	return true;

@@ -4,29 +4,22 @@
 #include <windowsx.h>
 #include <sstream>
 
-using namespace DirectX;
+using namespace DirectX;  
 
-namespace
-{
-	// This is just used to forward Windows messages from a global window
-	// procedure to our member function window procedure because we cannot
-	// assign a member function to WNDCLASS::lpfnWndProc.
-	D3DApp* gd3dApp = 0;
-}
+D3DApp* D3DApp::mApplication = 0;
 
 LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	// Forward hwnd on because we can get messages (e.g., WM_CREATE)
 	// before CreateWindow returns, and thus before mhMainWnd is valid.
-	return gd3dApp->MsgProc(hwnd, msg, wParam, lParam);
+	return D3DApp::GetApplication()->MsgProc(hwnd, msg, wParam, lParam);
 }
 
-D3DApp::D3DApp(HINSTANCE hInstance)
-	:	mhAppInst(hInstance),
-	mMainWndCaption(L"D3D11 Application")
+D3DApp::D3DApp()
+	:mMainWndCaption(L"D3D11 Application")
 {
+	mApplication = this;
 	ZeroMemory(&mScreenViewport, sizeof(D3D11_VIEWPORT));
-	gd3dApp = this; 
 }
 
 D3DApp::~D3DApp()
@@ -42,6 +35,11 @@ D3DApp::~D3DApp()
 
 	ReleaseCOM(md3dImmediateContext);
 	ReleaseCOM(md3dDevice);
+}
+
+D3DApp* D3DApp::GetApplication()
+{
+	return mApplication;
 }
 
 HINSTANCE D3DApp::AppInst() const
@@ -94,9 +92,9 @@ int D3DApp::Run()
 	return (int)msg.wParam;
 }
 
-bool D3DApp::Init()
+bool D3DApp::Init(HINSTANCE hinst)
 {
-	if (!InitMainWindow())
+	if (!InitMainWindow(hinst))
 		return false;
 
 	if (!InitDirect3D())
@@ -294,8 +292,10 @@ LRESULT D3DApp::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	return DefWindowProc(hwnd, msg, wParam, lParam);
 }
 
-bool D3DApp::InitMainWindow()
+bool D3DApp::InitMainWindow(HINSTANCE hInst)
 {
+	mhAppInst = hInst;
+
 	WNDCLASS wc;
 	wc.style = CS_HREDRAW | CS_VREDRAW;
 	wc.lpfnWndProc = MainWndProc;
@@ -464,3 +464,4 @@ void D3DApp::CalculateFrameStats()
 		timeElapsed += 1.0f;
 	}
 }
+

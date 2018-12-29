@@ -93,7 +93,8 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d11.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;commonlibd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(solutiondir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -144,19 +145,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\Common\D3DApp.h" />
-    <ClInclude Include="..\Common\D3DUtil.h" />
-    <ClInclude Include="..\Common\DxErr.h" />
-    <ClInclude Include="..\Common\GameTimer.h" />
     <ClInclude Include="InitDirect3DApp.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\Common\D3DApp.cpp" />
-    <ClCompile Include="..\Common\D3DUtil.cpp" />
-    <ClCompile Include="..\Common\dxerr.cpp" />
-    <ClCompile Include="..\Common\GameTimer.cpp" />
     <ClCompile Include="InitDirect3DApp.cpp" />
-    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

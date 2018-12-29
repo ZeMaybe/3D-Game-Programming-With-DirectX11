@@ -13,56 +13,17 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Common">
-      <UniqueIdentifier>{7530717a-6b75-40fd-bba4-4ace6f390a66}</UniqueIdentifier>
-    </Filter>
     <Filter Include="FX">
       <UniqueIdentifier>{366ec9f3-99e0-4d0b-8630-a1235d88a0ae}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\Common\D3DApp.cpp">
-      <Filter>Common</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Common\D3DUtil.cpp">
-      <Filter>Common</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Common\dxerr.cpp">
-      <Filter>Common</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Common\GameTimer.cpp">
-      <Filter>Common</Filter>
-    </ClCompile>
     <ClCompile Include="BoxApp.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="box.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Common\MathHelper.cpp">
-      <Filter>Common</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Common\D3DApp.h">
-      <Filter>Common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Common\D3DUtil.h">
-      <Filter>Common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Common\DxErr.h">
-      <Filter>Common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Common\GameTimer.h">
-      <Filter>Common</Filter>
-    </ClInclude>
     <ClInclude Include="BoxApp.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Common\MathHelper.h">
-      <Filter>Common</Filter>
-    </ClInclude>
-    <ClInclude Include="resource.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

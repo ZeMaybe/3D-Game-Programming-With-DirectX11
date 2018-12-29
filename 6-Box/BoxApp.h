@@ -13,10 +13,10 @@ struct Vertex
 class BoxApp :public D3DApp
 {
 public:
-	BoxApp(HINSTANCE hInstance);
+	BoxApp();
 	~BoxApp();
 
-	bool Init();
+	bool Init(HINSTANCE hinst);
 	void OnResize();
 	void UpdateScene(float dt);
 	void DrawScene();

@@ -4,9 +4,10 @@
 #include <fstream>
 using namespace DirectX;
 
-HillsApp::HillsApp(HINSTANCE hInstance)
-	:D3DApp(hInstance)
-	,mTheta(1.5f*XM_PI)
+HillsApp theApp;
+
+HillsApp::HillsApp()
+	:mTheta(1.5f*XM_PI)
 	, mPhi(0.1f*XM_PI)
 	, mRadius(200.0f)
 {
@@ -28,14 +29,14 @@ HillsApp::~HillsApp()
 	ReleaseCOM(mFX);
 	ReleaseCOM(mInputLayout);
 
-	ReleaseCOM(mTech);
+	//ReleaseCOM(mTech);
 	ReleaseCOM(mfxWorldViewProj);
 	ReleaseCOM(mRasterizeStateWireFrame);
 }
 
-bool HillsApp::Init()
+bool HillsApp::Init(HINSTANCE hInstance)
 {
-	if (!D3DApp::Init())
+	if (!D3DApp::Init(hInstance))
 		return false;
 
 	BuildGeometryBuffers();

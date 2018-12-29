@@ -13,68 +13,23 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Common">
-      <UniqueIdentifier>{143da42c-a141-4cf7-9ef6-6786ca0c5728}</UniqueIdentifier>
-    </Filter>
     <Filter Include="FX">
       <UniqueIdentifier>{1a0ea536-d8b6-4140-8957-29133b6620de}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\Common\D3DApp.cpp">
-      <Filter>Common</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Common\D3DUtil.cpp">
-      <Filter>Common</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Common\dxerr.cpp">
-      <Filter>Common</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Common\GameTimer.cpp">
-      <Filter>Common</Filter>
-    </ClCompile>
-    <ClCompile Include="Hills.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="HillsApp.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\Common\GeometryGenerator.cpp">
-      <Filter>Common</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Common\MathHelper.cpp">
-      <Filter>Common</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Common\D3DApp.h">
-      <Filter>Common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Common\D3DUtil.h">
-      <Filter>Common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Common\d3dx11effect.h">
-      <Filter>Common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Common\DxErr.h">
-      <Filter>Common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Common\GameTimer.h">
-      <Filter>Common</Filter>
-    </ClInclude>
     <ClInclude Include="HillsApp.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\Common\GeometryGenerator.h">
-      <Filter>Common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Common\MathHelper.h">
-      <Filter>Common</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="..\FX\Color.fx">
+    <CustomBuild Include="..\FX\Color.fx">
       <Filter>FX</Filter>
-    </FxCompile>
+    </CustomBuild>
   </ItemGroup>
 </Project>

@@ -1,13 +1,13 @@
 
-
 #include "ShapesApp.h"
 #include "GeometryGenerator.h"
 #include <fstream>
 using namespace DirectX;
 
-ShapesApp::ShapesApp(HINSTANCE hInstance)
-	:D3DApp(hInstance)
-	,mTheta(1.5f*XM_PI)
+ShapesApp theApp;
+
+ShapesApp::ShapesApp()
+	:mTheta(1.5f*XM_PI)
 	,mPhi(0.1f*XM_PI)
 	,mRadius(15.0f)
 {
@@ -46,13 +46,13 @@ ShapesApp::~ShapesApp()
 	ReleaseCOM(mInputLayout);
 	ReleaseCOM(mWireframeRS);
 
-	ReleaseCOM(mTech);
-	ReleaseCOM(mfxWorldViewProj);
+	//ReleaseCOM(mTech);
+	//ReleaseCOM(mfxWorldViewProj);
 }
 
-bool ShapesApp::Init()
+bool ShapesApp::Init(HINSTANCE hInstance)
 {
-	if (!D3DApp::Init())
+	if (!D3DApp::Init(hInstance))
 		return false;
 
 	BuildGeometryBuffers();

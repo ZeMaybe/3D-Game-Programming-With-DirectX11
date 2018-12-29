@@ -242,3 +242,5 @@ ModelManifest.xml
 .fake/
 *.fxo
 *.cod
+/CommonLib/ReadMe.txt
+/lib/CommonLibd.lib

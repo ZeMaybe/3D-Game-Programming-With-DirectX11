@@ -93,7 +93,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d11.lib;Effects11d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;Effects11d.lib;commonlibd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(solutiondir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -145,22 +145,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\Common\D3DApp.cpp" />
-    <ClCompile Include="..\Common\D3DUtil.cpp" />
-    <ClCompile Include="..\Common\dxerr.cpp" />
-    <ClCompile Include="..\Common\GameTimer.cpp" />
-    <ClCompile Include="..\Common\MathHelper.cpp" />
     <ClCompile Include="BoxApp.cpp" />
-    <ClCompile Include="box.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Common\D3DApp.h" />
-    <ClInclude Include="..\Common\D3DUtil.h" />
-    <ClInclude Include="..\Common\DxErr.h" />
-    <ClInclude Include="..\Common\GameTimer.h" />
-    <ClInclude Include="..\Common\MathHelper.h" />
     <ClInclude Include="BoxApp.h" />
-    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\FX\Color.fx">

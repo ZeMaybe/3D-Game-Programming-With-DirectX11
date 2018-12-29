@@ -13,10 +13,10 @@ struct Vertex
 class ShapesApp : public D3DApp
 {
 public:
-	ShapesApp(HINSTANCE hInstance);
+	ShapesApp();
 	~ShapesApp();
 
-	bool Init();
+	bool Init(HINSTANCE hInstance);
 	void OnResize();
 	void UpdateScene(float dt);
 	void DrawScene();

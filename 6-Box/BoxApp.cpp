@@ -3,9 +3,10 @@
 
 using namespace DirectX;
 
-BoxApp::BoxApp(HINSTANCE hInstance)
-	:D3DApp(hInstance)
-	,mTheta(1.5f*XM_PI)
+BoxApp theApp;
+
+BoxApp::BoxApp()
+	:mTheta(1.5f*XM_PI)
 	,mPhi(0.25f*XM_PI)
 	,mRadius(5.0f)
 {
@@ -32,9 +33,9 @@ BoxApp::~BoxApp()
 	//ReleaseCOM(mfxWorldViewProj);
 }
 
-bool BoxApp::Init()
+bool BoxApp::Init(HINSTANCE hinst)
 {
-	if (!D3DApp::Init())
+	if (!D3DApp::Init(hinst))
 		return false;
 
 	BuildGeometryBuffers();

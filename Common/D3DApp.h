@@ -9,8 +9,10 @@
 class D3DApp
 {
 public:
-	D3DApp(HINSTANCE hInstance);
+	D3DApp();
 	virtual ~D3DApp();
+
+	static D3DApp* GetApplication();
 
 	HINSTANCE AppInst()const;
 	HWND      MainWnd()const;
@@ -21,7 +23,7 @@ public:
 	// Framework methods.  Derived client class overrides these methods to 
 	// implement specific application requirements.
 
-	virtual bool Init();
+	virtual bool Init(HINSTANCE hinst);
 	virtual void OnResize();
 	virtual void UpdateScene(float dt) = 0;
 	virtual void DrawScene();
@@ -33,7 +35,7 @@ public:
 	virtual void OnMouseMove(WPARAM btnState, int x, int y) { }
 
 protected:
-	bool InitMainWindow();
+	bool InitMainWindow(HINSTANCE hInst);
 	bool InitDirect3D();
 
 	void CalculateFrameStats();
@@ -66,6 +68,9 @@ protected:
 	int mClientWidth = 800;
 	int mClientHeight = 600;
 	bool mEnable4xMsaa = false;
+
+private:
+	static D3DApp* mApplication;
 };
 
 

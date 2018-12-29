@@ -15,10 +15,10 @@ class HillsApp : public D3DApp
 {
 
 public:
-	HillsApp(HINSTANCE hInstance);
+	HillsApp();
 	~HillsApp();
 
-	bool Init();
+	bool Init(HINSTANCE hInstance);
 	void OnResize();
 	void UpdateScene(float dt);
 	void DrawScene();
