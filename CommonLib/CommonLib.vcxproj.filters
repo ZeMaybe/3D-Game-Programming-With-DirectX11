@@ -42,13 +42,16 @@
     <ClCompile Include="LightHelper.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Effects.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="Vertex.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Waves.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="D3DEffects.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderStates.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -80,13 +83,16 @@
     <ClInclude Include="..\Common\LightHelper.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\Common\Effects.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="..\Common\Vertex.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\Waves.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\D3DEffects.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\RenderStates.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

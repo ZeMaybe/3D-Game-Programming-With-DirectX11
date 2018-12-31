@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Init Direct3D", "Init Direct3D\Init Direct3D.vcxproj", "{39D71D5A-EA4D-4E2A-A9C9-32F9ACF605ED}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "4-Init Direct3D", "Init Direct3D\Init Direct3D.vcxproj", "{39D71D5A-EA4D-4E2A-A9C9-32F9ACF605ED}"
 	ProjectSection(ProjectDependencies) = postProject
 		{ABA15DA6-9C57-4C1E-A3A5-CA563B9BFA5A} = {ABA15DA6-9C57-4C1E-A3A5-CA563B9BFA5A}
 	EndProjectSection
@@ -30,12 +30,27 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "6-Skull", "6-Skull\6-Skull.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CommonLib", "CommonLib\CommonLib.vcxproj", "{ABA15DA6-9C57-4C1E-A3A5-CA563B9BFA5A}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lighting", "Lighting\Lighting.vcxproj", "{604CD0D7-8491-4026-AACB-8E85A576E87F}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "7-Lighting", "Lighting\Lighting.vcxproj", "{604CD0D7-8491-4026-AACB-8E85A576E87F}"
 	ProjectSection(ProjectDependencies) = postProject
 		{ABA15DA6-9C57-4C1E-A3A5-CA563B9BFA5A} = {ABA15DA6-9C57-4C1E-A3A5-CA563B9BFA5A}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LitSkull", "LitSkull\LitSkull.vcxproj", "{766EB193-DF9C-449A-BEDF-F34DF4827A6F}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "7-LitSkull", "LitSkull\LitSkull.vcxproj", "{766EB193-DF9C-449A-BEDF-F34DF4827A6F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{ABA15DA6-9C57-4C1E-A3A5-CA563B9BFA5A} = {ABA15DA6-9C57-4C1E-A3A5-CA563B9BFA5A}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "8-Crate", "8-Crate\8-Crate.vcxproj", "{CCA1D220-D359-470D-A558-938F12091B50}"
+	ProjectSection(ProjectDependencies) = postProject
+		{ABA15DA6-9C57-4C1E-A3A5-CA563B9BFA5A} = {ABA15DA6-9C57-4C1E-A3A5-CA563B9BFA5A}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "8-TexturedHillsAndWaves", "TexturedHillsAndWaves\TexturedHillsAndWaves.vcxproj", "{B771CC1D-8802-470A-8768-A0B92DB03754}"
+	ProjectSection(ProjectDependencies) = postProject
+		{ABA15DA6-9C57-4C1E-A3A5-CA563B9BFA5A} = {ABA15DA6-9C57-4C1E-A3A5-CA563B9BFA5A}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "9-BlendDemo", "9-BlendDemo\9-BlendDemo.vcxproj", "{874755F4-8C8A-499E-8560-27DBD04F1620}"
 	ProjectSection(ProjectDependencies) = postProject
 		{ABA15DA6-9C57-4C1E-A3A5-CA563B9BFA5A} = {ABA15DA6-9C57-4C1E-A3A5-CA563B9BFA5A}
 	EndProjectSection
@@ -112,6 +127,30 @@ Global
 		{766EB193-DF9C-449A-BEDF-F34DF4827A6F}.Release|x64.Build.0 = Release|x64
 		{766EB193-DF9C-449A-BEDF-F34DF4827A6F}.Release|x86.ActiveCfg = Release|Win32
 		{766EB193-DF9C-449A-BEDF-F34DF4827A6F}.Release|x86.Build.0 = Release|Win32
+		{CCA1D220-D359-470D-A558-938F12091B50}.Debug|x64.ActiveCfg = Debug|x64
+		{CCA1D220-D359-470D-A558-938F12091B50}.Debug|x64.Build.0 = Debug|x64
+		{CCA1D220-D359-470D-A558-938F12091B50}.Debug|x86.ActiveCfg = Debug|Win32
+		{CCA1D220-D359-470D-A558-938F12091B50}.Debug|x86.Build.0 = Debug|Win32
+		{CCA1D220-D359-470D-A558-938F12091B50}.Release|x64.ActiveCfg = Release|x64
+		{CCA1D220-D359-470D-A558-938F12091B50}.Release|x64.Build.0 = Release|x64
+		{CCA1D220-D359-470D-A558-938F12091B50}.Release|x86.ActiveCfg = Release|Win32
+		{CCA1D220-D359-470D-A558-938F12091B50}.Release|x86.Build.0 = Release|Win32
+		{B771CC1D-8802-470A-8768-A0B92DB03754}.Debug|x64.ActiveCfg = Debug|x64
+		{B771CC1D-8802-470A-8768-A0B92DB03754}.Debug|x64.Build.0 = Debug|x64
+		{B771CC1D-8802-470A-8768-A0B92DB03754}.Debug|x86.ActiveCfg = Debug|Win32
+		{B771CC1D-8802-470A-8768-A0B92DB03754}.Debug|x86.Build.0 = Debug|Win32
+		{B771CC1D-8802-470A-8768-A0B92DB03754}.Release|x64.ActiveCfg = Release|x64
+		{B771CC1D-8802-470A-8768-A0B92DB03754}.Release|x64.Build.0 = Release|x64
+		{B771CC1D-8802-470A-8768-A0B92DB03754}.Release|x86.ActiveCfg = Release|Win32
+		{B771CC1D-8802-470A-8768-A0B92DB03754}.Release|x86.Build.0 = Release|Win32
+		{874755F4-8C8A-499E-8560-27DBD04F1620}.Debug|x64.ActiveCfg = Debug|x64
+		{874755F4-8C8A-499E-8560-27DBD04F1620}.Debug|x64.Build.0 = Debug|x64
+		{874755F4-8C8A-499E-8560-27DBD04F1620}.Debug|x86.ActiveCfg = Debug|Win32
+		{874755F4-8C8A-499E-8560-27DBD04F1620}.Debug|x86.Build.0 = Debug|Win32
+		{874755F4-8C8A-499E-8560-27DBD04F1620}.Release|x64.ActiveCfg = Release|x64
+		{874755F4-8C8A-499E-8560-27DBD04F1620}.Release|x64.Build.0 = Release|x64
+		{874755F4-8C8A-499E-8560-27DBD04F1620}.Release|x86.ActiveCfg = Release|Win32
+		{874755F4-8C8A-499E-8560-27DBD04F1620}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

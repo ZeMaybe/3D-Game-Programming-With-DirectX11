@@ -142,11 +142,12 @@ copy "$(targetdir)$(targetname).pdb" "$(solutiondir)lib\$(targetname).pdb"</Comm
     <ClCompile Include="D3DApp.cpp" />
     <ClCompile Include="D3DUtil.cpp" />
     <ClCompile Include="dxerr.cpp" />
-    <ClCompile Include="Effects.cpp" />
+    <ClCompile Include="D3DEffects.cpp" />
     <ClCompile Include="GameTimer.cpp" />
     <ClCompile Include="GeometryGenerator.cpp" />
     <ClCompile Include="LightHelper.cpp" />
     <ClCompile Include="MathHelper.cpp" />
+    <ClCompile Include="RenderStates.cpp" />
     <ClCompile Include="Vertex.cpp" />
     <ClCompile Include="Waves.cpp" />
   </ItemGroup>
@@ -156,11 +157,12 @@ copy "$(targetdir)$(targetname).pdb" "$(solutiondir)lib\$(targetname).pdb"</Comm
     <ClInclude Include="..\Common\d3dx11effect.h" />
     <ClInclude Include="..\Common\d3dxGlobal.h" />
     <ClInclude Include="..\Common\DxErr.h" />
-    <ClInclude Include="..\Common\Effects.h" />
+    <ClInclude Include="..\Common\D3DEffects.h" />
     <ClInclude Include="..\Common\GameTimer.h" />
     <ClInclude Include="..\Common\GeometryGenerator.h" />
     <ClInclude Include="..\Common\LightHelper.h" />
     <ClInclude Include="..\Common\MathHelper.h" />
+    <ClInclude Include="..\Common\RenderStates.h" />
     <ClInclude Include="..\Common\Vertex.h" />
     <ClInclude Include="..\Common\Waves.h" />
   </ItemGroup>

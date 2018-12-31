@@ -55,7 +55,13 @@ void InputLayoutFactory::InitAllInputDesc()
 	InputLayoutDesc* PosColor = new InputLayoutDesc(L"PosColor", 2);
 	PosColor->mDesc[0] = { "POSITION",0,DXGI_FORMAT_R32G32B32_FLOAT,0,0,D3D11_INPUT_PER_VERTEX_DATA,0 } ;
 	PosColor->mDesc[1] = { "COLOR",0,DXGI_FORMAT_R32G32B32A32_FLOAT,0,12,D3D11_INPUT_PER_VERTEX_DATA,0 };
+
+	InputLayoutDesc* PosNormalTexCod = new InputLayoutDesc(L"PosNormalTexCod", 3);
+	PosNormalTexCod->mDesc[0] = { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 };
+	PosNormalTexCod->mDesc[1] = { "NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 };
+	PosNormalTexCod->mDesc[2] = { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 };
 	
 	mAllInputDesc.insert(InputPair(PosNormal->mLayoutName,PosNormal));
 	mAllInputDesc.insert(InputPair(PosColor->mLayoutName, PosColor));
+	mAllInputDesc.insert(InputPair(PosNormalTexCod->mLayoutName, PosNormalTexCod));
 }

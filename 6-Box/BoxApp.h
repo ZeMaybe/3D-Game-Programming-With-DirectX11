@@ -3,7 +3,7 @@
 #define BoxApp_h__
 
 #include "D3DApp.h"
-#include "Effects.h"
+#include "D3DEffects.h"
 #include "Vertex.h"
 
 

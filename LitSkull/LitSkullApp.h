@@ -3,7 +3,7 @@
 
 #include "D3DApp.h"
 #include "LightHelper.h"
-#include "Effects.h"
+#include "D3DEffects.h"
 #include "Vertex.h"
 
 class LitSkullApp :public D3DApp
