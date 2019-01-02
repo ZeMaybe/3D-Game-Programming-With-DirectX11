@@ -8,11 +8,20 @@ public:
 	static void InitAll(ID3D11Device* device);
 	static void DestroyAll();
 
+	// RasterizerState
 	static ID3D11RasterizerState* WireframeRS;
 	static ID3D11RasterizerState* NoCullRS;
+	static ID3D11RasterizerState* CullClockwiseRS;
 
+	// BlendState
 	static ID3D11BlendState* AlphaToCoverageBS;
 	static ID3D11BlendState* TransparentBS;
+	static ID3D11BlendState* NoRenderTargetWritesBS;
+
+	// Depth/stencil state
+	static ID3D11DepthStencilState* MarkMirrorDSS;
+	static ID3D11DepthStencilState* DrawReflectionDSS;
+	static ID3D11DepthStencilState* NoDoubleBlendDSS;
 };
 
 

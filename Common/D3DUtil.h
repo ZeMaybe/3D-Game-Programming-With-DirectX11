@@ -8,12 +8,12 @@
 
 #include <d3d11.h>
 #include <DirectXMath.h>
-#include <DirectXColors.h>
+#include <DirectXColors.h> 
 
 #include <d3dcompiler.h>
 #include <d3dcommon.h>
-
-#include <wrl/client.h>
+#include <string>
+#include <vector>
 
 #include "DxErr.h"
 #include "d3dx11effect.h" 
@@ -25,10 +25,8 @@
 #include <cassert>
 #include <ctime>
 #include <algorithm>
-#include <string>
 #include <sstream>
 #include <fstream>
-#include <vector>
 #include "MathHelper.h"
 #include "LightHelper.h"
 */
@@ -57,5 +55,19 @@
 #define HR(x) (x)
 #endif
 #endif 
+
+class D3DHelper
+{
+public:
+	static ID3D11ShaderResourceView* CreateTexture2DArraySRV(ID3D11Device* device,ID3D11DeviceContext* contex,
+		std::vector<std::wstring>& fileNames,
+		DXGI_FORMAT format = DXGI_FORMAT_B8G8R8X8_TYPELESS,
+		UINT filter = 0,
+		UINT mipFilter = 0);
+};
+
+
+
+
 
 #endif // D3DUtil_h__

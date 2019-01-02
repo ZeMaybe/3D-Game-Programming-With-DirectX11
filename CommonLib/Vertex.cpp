@@ -65,3 +65,27 @@ void InputLayoutFactory::InitAllInputDesc()
 	mAllInputDesc.insert(InputPair(PosColor->mLayoutName, PosColor));
 	mAllInputDesc.insert(InputPair(PosNormalTexCod->mLayoutName, PosNormalTexCod));
 }
+
+Vertex::PosNormalTexCod::PosNormalTexCod()
+	:Pos(0.0f,0.0f,0.0f)
+	,Normal(0.0f,0.0f,0.0f)
+	,Tex(0.0f,0.0f)
+{
+
+}
+
+Vertex::PosNormalTexCod::PosNormalTexCod(float px, float py, float pz, float nx, float ny, float nz, float u, float v)
+	:Pos(px,py,pz)
+	,Normal(nx,ny,nz)
+	,Tex(u,v)
+{
+
+}
+
+Vertex::PosNormalTexCod::PosNormalTexCod(const DirectX::XMFLOAT3& pos, const DirectX::XMFLOAT3& n, const DirectX::XMFLOAT2& uv)
+	:Pos(pos)
+	,Normal(n)
+	,Tex(uv)
+{
+
+}

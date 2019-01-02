@@ -24,10 +24,21 @@ namespace Vertex
 
 	struct PosNormalTexCod
 	{
+		PosNormalTexCod();
+		PosNormalTexCod(const DirectX::XMFLOAT3& pos, const DirectX::XMFLOAT3& n, const DirectX::XMFLOAT2& uv);
+		PosNormalTexCod(float px, float py, float pz, float nx, float ny, float nz, float u, float v);
+
 		DirectX::XMFLOAT3 Pos;
 		DirectX::XMFLOAT3 Normal;
 		DirectX::XMFLOAT2 Tex;
 	};
+
+	struct TreePointSprite
+	{
+		DirectX::XMFLOAT3 Pos;
+		DirectX::XMFLOAT2 Size;
+	};
+
 }  
 
 struct InputLayoutDesc
