@@ -60,10 +60,15 @@ void InputLayoutFactory::InitAllInputDesc()
 	PosNormalTexCod->mDesc[0] = { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 };
 	PosNormalTexCod->mDesc[1] = { "NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 };
 	PosNormalTexCod->mDesc[2] = { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 };
+
+	InputLayoutDesc* TreePointSprite = new InputLayoutDesc(L"TreePointSprite", 2);
+	TreePointSprite->mDesc[0] = { "POSITION",0,DXGI_FORMAT_R32G32B32_FLOAT,0,0,D3D11_INPUT_PER_VERTEX_DATA,0 };
+	TreePointSprite->mDesc[1] = { "SIZE",0,DXGI_FORMAT_R32G32_FLOAT,0,12,D3D11_INPUT_PER_VERTEX_DATA,0 };
 	
 	mAllInputDesc.insert(InputPair(PosNormal->mLayoutName,PosNormal));
 	mAllInputDesc.insert(InputPair(PosColor->mLayoutName, PosColor));
 	mAllInputDesc.insert(InputPair(PosNormalTexCod->mLayoutName, PosNormalTexCod));
+	mAllInputDesc.insert(InputPair(TreePointSprite->mLayoutName, TreePointSprite));
 }
 
 Vertex::PosNormalTexCod::PosNormalTexCod()

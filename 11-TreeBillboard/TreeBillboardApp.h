@@ -60,12 +60,12 @@ private:
 	Waves mWaves;
 
 	// effect
-	TextureBlendFogEffect* mEffect01;
-	//TextureBlendFogEffect* mEffect02;
+	TextureBlendFogEffect* mEffect01;    // 绘制山水
+	TreeSpriteEffect* mEffect02;    // 绘制树
 
 	InputLayouts mInputLayouts;
-	ID3D11InputLayout* mInputLayout01;
-	ID3D11InputLayout* mInputLayout02;
+	ID3D11InputLayout* mInputLayout01;    // 绘制山水
+	ID3D11InputLayout* mInputLayout02;    // 绘制树
 
 	DirectionalLight mDirLights[3];
 	Material mLandMat;

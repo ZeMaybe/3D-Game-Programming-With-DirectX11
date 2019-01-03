@@ -60,10 +60,7 @@ class D3DHelper
 {
 public:
 	static ID3D11ShaderResourceView* CreateTexture2DArraySRV(ID3D11Device* device,ID3D11DeviceContext* contex,
-		std::vector<std::wstring>& fileNames,
-		DXGI_FORMAT format = DXGI_FORMAT_B8G8R8X8_TYPELESS,
-		UINT filter = 0,
-		UINT mipFilter = 0);
+		std::vector<std::wstring>& fileNames);
 };
 
 

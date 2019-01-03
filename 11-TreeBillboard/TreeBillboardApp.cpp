@@ -65,7 +65,6 @@ TreeBillboardApp::TreeBillboardApp()
 	mTreeMat.Specular = XMFLOAT4(0.2f, 0.2f, 0.2f, 16.0f);
 }
 
-
 TreeBillboardApp::~TreeBillboardApp()
 {
 	md3dImmediateContext->ClearState();
@@ -81,12 +80,13 @@ TreeBillboardApp::~TreeBillboardApp()
 	ReleaseCOM(mBoxMapSRV);
 	ReleaseCOM(mTreeTextureMapArraySRV);
 
-	//Effects::DestroyAll();
-	//InputLayouts::DestroyAll();
+	ReleaseCOM(mInputLayout01);
+	ReleaseCOM(mInputLayout02);
+	SafeDelete(mEffect01);
+	SafeDelete(mEffect02);
+
 	RenderStates::DestroyAll();
 }
-
-
 
 bool TreeBillboardApp::Init(HINSTANCE hinst)
 {
@@ -101,6 +101,9 @@ bool TreeBillboardApp::Init(HINSTANCE hinst)
 
 	mEffect01 = new TextureBlendFogEffect(md3dDevice, L"../FX/BasicTextureFog.fxo");
 	mInputLayout01 = mInputLayouts.InitLayout(md3dDevice, mEffect01->Light1Tech, L"PosNormalTexCod");
+
+	mEffect02 = new TreeSpriteEffect(md3dDevice, L"../FX/TreeSprite.fxo");
+	mInputLayout02 = mInputLayouts.InitLayout(md3dDevice, mEffect02->Light3Tech, L"TreePointSprite");
 
 	RenderStates::InitAll(md3dDevice);
 
@@ -593,56 +596,52 @@ void TreeBillboardApp::BuildTreeSpritesBuffer()
 
 void TreeBillboardApp::DrawTreeSprites(CXMMATRIX viewProj)
 {
+	mEffect02->SetDirLights(mDirLights);
+	mEffect02->SetEyePosW(mEyePosW);
+	mEffect02->SetFogColor(Colors::Silver);
+	mEffect02->SetFogStart(15.0f);
+	mEffect02->SetFogRange(175.0f);
+	mEffect02->SetViewProj(viewProj);
+	mEffect02->SetMaterial(mTreeMat);
+	mEffect02->SetTreeTextureMapArray(mTreeTextureMapArraySRV);
 
+	md3dImmediateContext->IASetInputLayout(mInputLayout02);
+	md3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);    // 绘制点列表
+
+	UINT stride = sizeof(Vertex::TreePointSprite);
+	UINT offset = 0;
+
+	ID3DX11EffectTechnique* treeTech;
+	switch (mRenderOptions)
+	{
+	case RenderOptions::Lighting:
+		treeTech = mEffect02->Light3Tech;
+		break;
+	case RenderOptions::Textures:
+		treeTech = mEffect02->Light3TexAlphaClipTech;
+		break;
+	case RenderOptions::TexturesAndFog:
+		treeTech = mEffect02->Light3TexAlphaClipFogTech;
+		break;
+	}
+
+	float blendFactor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+	D3DX11_TECHNIQUE_DESC techDesc;
+	treeTech->GetDesc(&techDesc);
+
+	for (UINT p = 0; p < techDesc.Passes; ++p)
+	{
+		md3dImmediateContext->IASetVertexBuffers(0, 1, &mTreeSpritesVB, &stride, &offset);
+
+		if (mAlphaToCoverageOn)
+		{
+			md3dImmediateContext->OMSetBlendState(RenderStates::AlphaToCoverageBS, blendFactor, 0xffffffff);
+		}
+
+		treeTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
+
+		md3dImmediateContext->Draw(TreeCount, 0);
+
+		md3dImmediateContext->OMSetBlendState(0, blendFactor, 0xffffffff);
+	}
 }
-/* 
-
-void TreeBillboardApp::DrawTreeSprites(CXMMATRIX viewProj)
-{
-Effects::TreeSpriteFX->SetDirLights(mDirLights);
-Effects::TreeSpriteFX->SetEyePosW(mEyePosW);
-Effects::TreeSpriteFX->SetFogColor(Colors::Silver);
-Effects::TreeSpriteFX->SetFogStart(15.0f);
-Effects::TreeSpriteFX->SetFogRange(175.0f);
-Effects::TreeSpriteFX->SetViewProj(viewProj);
-Effects::TreeSpriteFX->SetMaterial(mTreeMat);
-Effects::TreeSpriteFX->SetTreeTextureMapArray(mTreeTextureMapArraySRV);
-
-md3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
-md3dImmediateContext->IASetInputLayout(InputLayouts::TreePointSprite);
-UINT stride = sizeof(Vertex::TreePointSprite);
-UINT offset = 0;
-
-ID3DX11EffectTechnique* treeTech;
-switch (mRenderOptions)
-{
-case RenderOptions::Lighting:
-treeTech = Effects::TreeSpriteFX->Light3Tech;
-break;
-case RenderOptions::Textures:
-treeTech = Effects::TreeSpriteFX->Light3TexAlphaClipTech;
-break;
-case RenderOptions::TexturesAndFog:
-treeTech = Effects::TreeSpriteFX->Light3TexAlphaClipFogTech;
-break;
-}
-
-D3DX11_TECHNIQUE_DESC techDesc;
-treeTech->GetDesc(&techDesc);
-for (UINT p = 0; p < techDesc.Passes; ++p)
-{
-md3dImmediateContext->IASetVertexBuffers(0, 1, &mTreeSpritesVB, &stride, &offset);
-
-float blendFactor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-
-if (mAlphaToCoverageOn)
-{
-md3dImmediateContext->OMSetBlendState(RenderStates::AlphaToCoverageBS, blendFactor, 0xffffffff);
-}
-treeTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
-md3dImmediateContext->Draw(TreeCount, 0);
-
-md3dImmediateContext->OMSetBlendState(0, blendFactor, 0xffffffff);
-}
-}
-*/

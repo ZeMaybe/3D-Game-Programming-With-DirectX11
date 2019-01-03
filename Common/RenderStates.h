@@ -22,6 +22,11 @@ public:
 	static ID3D11DepthStencilState* MarkMirrorDSS;
 	static ID3D11DepthStencilState* DrawReflectionDSS;
 	static ID3D11DepthStencilState* NoDoubleBlendDSS;
+
+private:
+	static void InitRasterizerState(ID3D11Device* device);
+	static void InitBlendState(ID3D11Device* device);
+	static void InitDepthStencilState(ID3D11Device* device);
 };
 
 

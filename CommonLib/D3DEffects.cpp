@@ -264,3 +264,47 @@ TextureBlendFogEffect::~TextureBlendFogEffect()
 	ReleaseCOM(FogStart);
 	ReleaseCOM(FogRange);
 }
+
+TreeSpriteEffect::TreeSpriteEffect(ID3D11Device* device, const std::wstring& filename)
+	:Effect(device,filename)
+{
+	Light3Tech = mFX->GetTechniqueByName("Light3");
+	Light3TexAlphaClipTech = mFX->GetTechniqueByName("Light3TexAlphaClip");
+	Light3TexAlphaClipFogTech = mFX->GetTechniqueByName("Light3TexAlphaClipFog");
+
+	ViewProj = mFX->GetVariableByName("gViewProj")->AsMatrix();
+	EyePosW = mFX->GetVariableByName("gEyePosW")->AsVector();
+	FogColor = mFX->GetVariableByName("gFogColor")->AsVector();
+	FogStart = mFX->GetVariableByName("gFogStart")->AsScalar();
+	FogRange = mFX->GetVariableByName("gFogRange")->AsScalar();
+	DirLights = mFX->GetVariableByName("gDirLights");
+	Mat = mFX->GetVariableByName("gMaterial");
+	TreeTextureMapArray = mFX->GetVariableByName("gTreeMapArray")->AsShaderResource();
+
+	assert(Light3Tech->IsValid());
+	assert(Light3TexAlphaClipTech->IsValid());
+	assert(Light3TexAlphaClipFogTech->IsValid());
+	assert(ViewProj->IsValid());
+	assert(EyePosW->IsValid());
+	assert(FogColor->IsValid());
+	assert(FogStart->IsValid());
+	assert(FogRange->IsValid());
+	assert(DirLights->IsValid());
+	assert(Mat->IsValid());
+	assert(TreeTextureMapArray->IsValid()); 
+}
+
+TreeSpriteEffect::~TreeSpriteEffect()
+{
+	ReleaseCOM(Light3Tech);
+	ReleaseCOM(Light3TexAlphaClipTech);
+	ReleaseCOM(Light3TexAlphaClipFogTech);
+	ReleaseCOM(ViewProj);
+	ReleaseCOM(EyePosW);
+	ReleaseCOM(FogColor);
+	ReleaseCOM(FogStart);
+	ReleaseCOM(FogRange);
+	ReleaseCOM(DirLights);
+	ReleaseCOM(Mat);
+	ReleaseCOM(TreeTextureMapArray);
+}
