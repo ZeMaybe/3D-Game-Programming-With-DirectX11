@@ -244,3 +244,4 @@ ModelManifest.xml
 *.cod
 /CommonLib/ReadMe.txt
 /lib/CommonLibd.lib
+/12-VecAdd/results.txt
