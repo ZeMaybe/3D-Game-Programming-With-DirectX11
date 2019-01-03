@@ -308,3 +308,27 @@ TreeSpriteEffect::~TreeSpriteEffect()
 	ReleaseCOM(Mat);
 	ReleaseCOM(TreeTextureMapArray);
 }
+
+VecAddEffect::VecAddEffect(ID3D11Device* device, const std::wstring& filename)
+	:Effect(device,filename)
+{
+	VecAddTech = mFX->GetTechniqueByName("VecAdd");
+
+	InputA = mFX->GetVariableByName("gInputA")->AsShaderResource();
+	InputB = mFX->GetVariableByName("gInputB")->AsShaderResource();
+	Output = mFX->GetVariableByName("gOutput")->AsUnorderedAccessView();
+
+	assert(VecAddTech->IsValid());
+	assert(InputA->IsValid());
+	assert(InputB->IsValid());
+	assert(Output->IsValid());
+
+}
+
+VecAddEffect::~VecAddEffect()
+{
+	ReleaseCOM(VecAddTech);
+	ReleaseCOM(InputA);
+	ReleaseCOM(InputB);
+	ReleaseCOM(Output);
+}

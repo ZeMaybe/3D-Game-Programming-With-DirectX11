@@ -189,6 +189,27 @@ public:
 	ID3DX11EffectShaderResourceVariable* TreeTextureMapArray;
 };
 
+
+
+class VecAddEffect : public Effect
+{
+public:
+	VecAddEffect(ID3D11Device* device, const std::wstring& filename);
+	~VecAddEffect();
+
+	void SetInputA(ID3D11ShaderResourceView* srv) { InputA->SetResource(srv); }
+	void SetInputB(ID3D11ShaderResourceView* srv) { InputB->SetResource(srv); }
+	void SetOutput(ID3D11UnorderedAccessView* uav) { Output->SetUnorderedAccessView(uav); }
+
+	ID3DX11EffectTechnique* VecAddTech;
+
+	ID3DX11EffectShaderResourceVariable* InputA;
+	ID3DX11EffectShaderResourceVariable* InputB;
+	ID3DX11EffectUnorderedAccessViewVariable* Output;
+};
+
+
+
 class Effects
 {
 public:
