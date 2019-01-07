@@ -138,6 +138,7 @@ copy "$(targetdir)$(targetname).pdb" "$(solutiondir)lib\$(targetname).pdb"</Comm
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CommonLib.cpp" />
     <ClCompile Include="D3DApp.cpp" />
     <ClCompile Include="D3DUtil.cpp" />
@@ -152,6 +153,7 @@ copy "$(targetdir)$(targetname).pdb" "$(solutiondir)lib\$(targetname).pdb"</Comm
     <ClCompile Include="Waves.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Common\Camera.h" />
     <ClInclude Include="..\Common\D3DApp.h" />
     <ClInclude Include="..\Common\D3DUtil.h" />
     <ClInclude Include="..\Common\d3dx11effect.h" />
