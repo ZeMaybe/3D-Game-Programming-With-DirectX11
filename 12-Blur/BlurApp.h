@@ -33,7 +33,6 @@ public:
 	void OnMouseMove(WPARAM btnState, int x, int y);
 
 private:
-	void UpdateWaves();
 	void DrawWrapper();
 	void DrawScreenQuad();
 	float GetHillHeight(float x, float z)const;
@@ -71,6 +70,7 @@ private:
 	ID3D11RenderTargetView* mOffscreenRTV=0;
 
 	//TextureBlendFogEffect
+	TextureBlendFogEffect* mEffect01 = 0;
 	ID3D11InputLayout* mInputLayout = 0;
 	InputLayouts mInputLayouts;
 

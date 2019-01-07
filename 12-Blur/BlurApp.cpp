@@ -65,7 +65,6 @@ BlurApp::BlurApp()
 	mBoxMat.Specular = XMFLOAT4(0.4f, 0.4f, 0.4f, 16.0f);
 }
 
-
 BlurApp::~BlurApp()
 {
 	md3dImmediateContext->ClearState();
@@ -89,6 +88,7 @@ BlurApp::~BlurApp()
 
 	ReleaseCOM(mInputLayout);
 
+	SafeDelete(mEffect01);
 	//Effects::DestroyAll();
 	//InputLayouts::DestroyAll();
 	RenderStates::DestroyAll();
@@ -103,6 +103,8 @@ bool BlurApp::Init(HINSTANCE hinst)
 	// Must init Effects first since InputLayouts depend on shader signatures.
 	//Effects::InitAll(md3dDevice);
 	//InputLayouts::InitAll(md3dDevice);
+	mEffect01 = new TextureBlendFogEffect(md3dDevice, L"../FX/BasicTextureFog.fxo");
+	mInputLayout = mInputLayouts.InitLayout(md3dDevice, mEffect01->Light1Tech, L"PosNormalTexCod");
 	RenderStates::InitAll(md3dDevice);
 
 	ID3D11Resource* res = 0;
@@ -208,44 +210,28 @@ void BlurApp::UpdateScene(float dt)
 		mRenderOptions = RenderOptions::TexturesAndFog;
 }
 
-
-/*
-
-
 void BlurApp::DrawScene()
 {
-// Render to our offscreen texture.  Note that we can use the same depth/stencil buffer
-// we normally use since our offscreen texture matches the dimensions.
+	ID3D11RenderTargetView* renderTargets[1] = { mOffscreenRTV };
+	md3dImmediateContext->OMSetRenderTargets(1, renderTargets, mDepthStencilView);
+	md3dImmediateContext->ClearRenderTargetView(mOffscreenRTV, reinterpret_cast<const float*>(&Colors::Silver));
+	md3dImmediateContext->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-ID3D11RenderTargetView* renderTargets[1] = { mOffscreenRTV };
-md3dImmediateContext->OMSetRenderTargets(1, renderTargets, mDepthStencilView);
+	// 绘制到mOffscreenRTV -- 绘制到纹理
+	DrawWrapper();
 
-md3dImmediateContext->ClearRenderTargetView(mOffscreenRTV, reinterpret_cast<const float*>(&Colors::Silver));
-md3dImmediateContext->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	renderTargets[0] = mRenderTargetView;
+	md3dImmediateContext->OMSetRenderTargets(1, renderTargets, mDepthStencilView);
 
-// Draw the scene to the offscreen texture  -- 绘制到纹理
-DrawWrapper();
+	md3dImmediateContext->ClearRenderTargetView(mRenderTargetView, reinterpret_cast<const float*>(&Colors::Silver));
+	md3dImmediateContext->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-// Restore the back buffer.  The offscreen render target will serve as an input into
-// the compute shader for blurring, so we must unbind it from the OM stage before we
-// can use it as an input into the compute shader.
-renderTargets[0] = mRenderTargetView;
-md3dImmediateContext->OMSetRenderTargets(1, renderTargets, mDepthStencilView);
+//	mBlur.BlurInPlace(md3dImmediateContext, mOffscreenSRV, mOffscreenUAV, 4);
 
-//mBlur.SetGaussianWeights(4.0f);
-mBlur.BlurInPlace(md3dImmediateContext, mOffscreenSRV, mOffscreenUAV, 4);
+	DrawScreenQuad();
 
-// Draw fullscreen quad with texture of blurred scene on it.
-md3dImmediateContext->ClearRenderTargetView(mRenderTargetView, reinterpret_cast<const float*>(&Colors::Silver));
-md3dImmediateContext->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-
-// 绘制到后台缓冲
-DrawScreenQuad();
-
-HR(mSwapChain->Present(0, 0));
-}
-
-*/
+	HR(mSwapChain->Present(0, 0));
+} 
 
 void BlurApp::OnMouseDown(WPARAM btnState, int x, int y)
 {
@@ -292,127 +278,117 @@ void BlurApp::OnMouseMove(WPARAM btnState, int x, int y)
 	mLastMousePos.y = y;
 }
 
-/*
-
 void BlurApp::DrawWrapper()
 {
-md3dImmediateContext->IASetInputLayout(InputLayouts::Basic32);
-md3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	md3dImmediateContext->IASetInputLayout(mInputLayout);
+	md3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-float blendFactor[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+	ID3DX11EffectTechnique* boxTech;
+	ID3DX11EffectTechnique* landAndWavesTech; 
+	switch (mRenderOptions)
+	{
+	case RenderOptions::Lighting:
+		boxTech = mEffect01->Light3Tech;
+		landAndWavesTech = mEffect01->Light3Tech;
+		break;
+	case RenderOptions::Textures:
+		boxTech = mEffect01->Light3TexAlphaClipTech;
+		landAndWavesTech = mEffect01->Light3TexTech;
+		break;
+	case RenderOptions::TexturesAndFog:
+		boxTech = mEffect01->Light3TexAlphaClipFogTech;
+		landAndWavesTech = mEffect01->Light3TexFogTech;
+		break;
+	}
+	UINT stride = sizeof(Vertex::PosNormalTexCod);
+	UINT offset = 0;
 
-UINT stride = sizeof(Vertex::Basic32);
-UINT offset = 0;
+	XMMATRIX view = XMLoadFloat4x4(&mView);
+	XMMATRIX proj = XMLoadFloat4x4(&mProj);
+	XMMATRIX viewProj = view*proj;
 
-XMMATRIX view = XMLoadFloat4x4(&mView);
-XMMATRIX proj = XMLoadFloat4x4(&mProj);
-XMMATRIX viewProj = view*proj;
+	mEffect01->SetDirLights(mDirLights);
+	mEffect01->SetEyePosW(mEyePosW);
+	mEffect01->SetFogColor(Colors::Silver);
+	mEffect01->SetFogStart(15.0f);
+	mEffect01->SetFogRange(175.0f);
 
-// Set per frame constants.
-Effects::BasicFX->SetDirLights(mDirLights);
-Effects::BasicFX->SetEyePosW(mEyePosW);
-Effects::BasicFX->SetFogColor(Colors::Silver);
-Effects::BasicFX->SetFogStart(15.0f);
-Effects::BasicFX->SetFogRange(175.0f);
+	D3DX11_TECHNIQUE_DESC techDesc;
 
-ID3DX11EffectTechnique* boxTech;
-ID3DX11EffectTechnique* landAndWavesTech;
+	// Draw the box with alpha clipping.
+	boxTech->GetDesc(&techDesc); 
+	for (UINT p = 0; p < techDesc.Passes; ++p)
+	{
+		md3dImmediateContext->IASetVertexBuffers(0, 1, &mBoxVB, &stride, &offset);
+		md3dImmediateContext->IASetIndexBuffer(mBoxIB, DXGI_FORMAT_R32_UINT, 0);
 
-switch (mRenderOptions)
-{
-case RenderOptions::Lighting:
-boxTech = Effects::BasicFX->Light3Tech;
-landAndWavesTech = Effects::BasicFX->Light3Tech;
-break;
-case RenderOptions::Textures:
-boxTech = Effects::BasicFX->Light3TexAlphaClipTech;
-landAndWavesTech = Effects::BasicFX->Light3TexTech;
-break;
-case RenderOptions::TexturesAndFog:
-boxTech = Effects::BasicFX->Light3TexAlphaClipFogTech;
-landAndWavesTech = Effects::BasicFX->Light3TexFogTech;
-break;
-}
+		// Set per object constants.
+		XMMATRIX world = XMLoadFloat4x4(&mBoxWorld);
+		XMMATRIX worldInvTranspose = MathHelper::InverseTranspose(world);
+		XMMATRIX worldViewProj = world*view*proj;
 
-D3DX11_TECHNIQUE_DESC techDesc;
+		mEffect01->SetWorld(world);
+		mEffect01->SetWorldInvTranspose(worldInvTranspose);
+		mEffect01->SetWorldViewProj(worldViewProj);
+		mEffect01->SetTexTransform(XMMatrixIdentity());
+		mEffect01->SetMaterial(mBoxMat);
+		mEffect01->SetDiffuseMap(mCrateSRV);
 
-// Draw the box with alpha clipping.
-boxTech->GetDesc(&techDesc);
-for (UINT p = 0; p < techDesc.Passes; ++p)
-{
-md3dImmediateContext->IASetVertexBuffers(0, 1, &mBoxVB, &stride, &offset);
-md3dImmediateContext->IASetIndexBuffer(mBoxIB, DXGI_FORMAT_R32_UINT, 0);
+		md3dImmediateContext->RSSetState(RenderStates::NoCullRS);
+		boxTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
+		md3dImmediateContext->DrawIndexed(36, 0, 0);
 
-// Set per object constants.
-XMMATRIX world = XMLoadFloat4x4(&mBoxWorld);
-XMMATRIX worldInvTranspose = MathHelper::InverseTranspose(world);
-XMMATRIX worldViewProj = world*view*proj;
+		// Restore default render state.
+		md3dImmediateContext->RSSetState(0);
+	}
 
-Effects::BasicFX->SetWorld(world);
-Effects::BasicFX->SetWorldInvTranspose(worldInvTranspose);
-Effects::BasicFX->SetWorldViewProj(worldViewProj);
-Effects::BasicFX->SetTexTransform(XMMatrixIdentity());
-Effects::BasicFX->SetMaterial(mBoxMat);
-Effects::BasicFX->SetDiffuseMap(mCrateSRV);
+	float blendFactor[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+	landAndWavesTech->GetDesc(&techDesc);
+	for (UINT p = 0; p < techDesc.Passes; ++p)
+	{ 
+		// Draw the hills.
+		md3dImmediateContext->IASetVertexBuffers(0, 1, &mLandVB, &stride, &offset);
+		md3dImmediateContext->IASetIndexBuffer(mLandIB, DXGI_FORMAT_R32_UINT, 0);
 
-md3dImmediateContext->RSSetState(RenderStates::NoCullRS);
-boxTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
-md3dImmediateContext->DrawIndexed(36, 0, 0);
+		// Set per object constants.
+		XMMATRIX world = XMLoadFloat4x4(&mLandWorld);
+		XMMATRIX worldInvTranspose = MathHelper::InverseTranspose(world);
+		XMMATRIX worldViewProj = world*view*proj;
 
-// Restore default render state.
-md3dImmediateContext->RSSetState(0);
-}
+		mEffect01->SetWorld(world);
+		mEffect01->SetWorldInvTranspose(worldInvTranspose);
+		mEffect01->SetWorldViewProj(worldViewProj);
+		mEffect01->SetTexTransform(XMLoadFloat4x4(&mGrassTexTransform));
+		mEffect01->SetMaterial(mLandMat);
+		mEffect01->SetDiffuseMap(mGrassMapSRV);
 
-// Draw the hills and water with texture and fog (no alpha clipping needed).
-landAndWavesTech->GetDesc(&techDesc);
-for (UINT p = 0; p < techDesc.Passes; ++p)
-{
-// Draw the hills.
-md3dImmediateContext->IASetVertexBuffers(0, 1, &mLandVB, &stride, &offset);
-md3dImmediateContext->IASetIndexBuffer(mLandIB, DXGI_FORMAT_R32_UINT, 0);
+		landAndWavesTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
+		md3dImmediateContext->DrawIndexed(mLandIndexCount, 0, 0);
 
-// Set per object constants.
-XMMATRIX world = XMLoadFloat4x4(&mLandWorld);
-XMMATRIX worldInvTranspose = MathHelper::InverseTranspose(world);
-XMMATRIX worldViewProj = world*view*proj;
+		// Draw the waves.
+		md3dImmediateContext->IASetVertexBuffers(0, 1, &mWavesVB, &stride, &offset);
+		md3dImmediateContext->IASetIndexBuffer(mWavesIB, DXGI_FORMAT_R32_UINT, 0);
 
-Effects::BasicFX->SetWorld(world);
-Effects::BasicFX->SetWorldInvTranspose(worldInvTranspose);
-Effects::BasicFX->SetWorldViewProj(worldViewProj);
-Effects::BasicFX->SetTexTransform(XMLoadFloat4x4(&mGrassTexTransform));
-Effects::BasicFX->SetMaterial(mLandMat);
-Effects::BasicFX->SetDiffuseMap(mGrassMapSRV);
+		// Set per object constants.
+		world = XMLoadFloat4x4(&mWavesWorld);
+		worldInvTranspose = MathHelper::InverseTranspose(world);
+		worldViewProj = world*view*proj;
 
-landAndWavesTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
-md3dImmediateContext->DrawIndexed(mLandIndexCount, 0, 0);
+		mEffect01->SetWorld(world);
+		mEffect01->SetWorldInvTranspose(worldInvTranspose);
+		mEffect01->SetWorldViewProj(worldViewProj);
+		mEffect01->SetTexTransform(XMLoadFloat4x4(&mWaterTexTransform));
+		mEffect01->SetMaterial(mWavesMat);
+		mEffect01->SetDiffuseMap(mWavesMapSRV);
 
-// Draw the waves.
-md3dImmediateContext->IASetVertexBuffers(0, 1, &mWavesVB, &stride, &offset);
-md3dImmediateContext->IASetIndexBuffer(mWavesIB, DXGI_FORMAT_R32_UINT, 0);
+		md3dImmediateContext->OMSetBlendState(RenderStates::TransparentBS, blendFactor, 0xffffffff);
+		landAndWavesTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
+		md3dImmediateContext->DrawIndexed(3 * mWaves.TriangleCount(), 0, 0);
 
-// Set per object constants.
-world = XMLoadFloat4x4(&mWavesWorld);
-worldInvTranspose = MathHelper::InverseTranspose(world);
-worldViewProj = world*view*proj;
-
-Effects::BasicFX->SetWorld(world);
-Effects::BasicFX->SetWorldInvTranspose(worldInvTranspose);
-Effects::BasicFX->SetWorldViewProj(worldViewProj);
-Effects::BasicFX->SetTexTransform(XMLoadFloat4x4(&mWaterTexTransform));
-Effects::BasicFX->SetMaterial(mWavesMat);
-Effects::BasicFX->SetDiffuseMap(mWavesMapSRV);
-
-md3dImmediateContext->OMSetBlendState(RenderStates::TransparentBS, blendFactor, 0xffffffff);
-landAndWavesTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
-md3dImmediateContext->DrawIndexed(3 * mWaves.TriangleCount(), 0, 0);
-
-// Restore default blend state
-md3dImmediateContext->OMSetBlendState(0, blendFactor, 0xffffffff);
-}
-}
-
-*/
-
+		// Restore default blend state
+		md3dImmediateContext->OMSetBlendState(0, blendFactor, 0xffffffff);
+	} 
+} 
 
 void BlurApp::DrawScreenQuad()
 {
@@ -424,60 +400,43 @@ void BlurApp::DrawScreenQuad()
 
 	XMMATRIX identity = XMMatrixIdentity();
 
-	//ID3DX11EffectTechnique* texOnlyTex = 
-}
+	ID3DX11EffectTechnique* texOnlyTech = mEffect01->Light0TexTech;
+	D3DX11_TECHNIQUE_DESC techDesc;
+	texOnlyTech->GetDesc(&techDesc);
+	for (UINT p = 0; p < techDesc.Passes; ++p)
+	{
+		md3dImmediateContext->IASetVertexBuffers(0, 1, &mScreenQuadVB, &stride, &offset);
+		md3dImmediateContext->IASetIndexBuffer(mScreenQuadIB, DXGI_FORMAT_R32_UINT, 0);
 
-/*
-void BlurApp::DrawScreenQuad()
-{
-md3dImmediateContext->IASetInputLayout(InputLayouts::Basic32);
-md3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		mEffect01->SetWorld(identity);
+		mEffect01->SetWorldInvTranspose(identity);
+		mEffect01->SetWorldViewProj(identity);
+		mEffect01->SetTexTransform(identity);
+		mEffect01->SetDiffuseMap(mOffscreenSRV);   // 尚未做模糊
 
-UINT stride = sizeof(Vertex::Basic32);
-UINT offset = 0;
-
-XMMATRIX identity = XMMatrixIdentity();
-
-ID3DX11EffectTechnique* texOnlyTech = Effects::BasicFX->Light0TexTech;
-D3DX11_TECHNIQUE_DESC techDesc;
-
-texOnlyTech->GetDesc(&techDesc);
-for (UINT p = 0; p < techDesc.Passes; ++p)
-{
-md3dImmediateContext->IASetVertexBuffers(0, 1, &mScreenQuadVB, &stride, &offset);
-md3dImmediateContext->IASetIndexBuffer(mScreenQuadIB, DXGI_FORMAT_R32_UINT, 0);
-
-// 这些矩阵全部是单位矩阵。。。
-Effects::BasicFX->SetWorld(identity);
-Effects::BasicFX->SetWorldInvTranspose(identity);
-Effects::BasicFX->SetWorldViewProj(identity);
-Effects::BasicFX->SetTexTransform(identity);
-Effects::BasicFX->SetDiffuseMap(mBlur.GetBlurredOutput());
-
-texOnlyTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
-md3dImmediateContext->DrawIndexed(6, 0, 0);
-}
-}
+		texOnlyTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
+		md3dImmediateContext->DrawIndexed(6, 0, 0);
+	} 
+} 
 
 float BlurApp::GetHillHeight(float x, float z)const
 {
-return 0.3f*(z*sinf(0.1f*x) + x*cosf(0.1f*z));
+	return 0.3f*(z*sinf(0.1f*x) + x*cosf(0.1f*z));
 }
 
 XMFLOAT3 BlurApp::GetHillNormal(float x, float z)const
 {
-// n = (-df/dx, 1, -df/dz)
-XMFLOAT3 n(
--0.03f*z*cosf(0.1f*x) - 0.3f*cosf(0.1f*z),
-1.0f,
--0.3f*sinf(0.1f*x) + 0.03f*x*sinf(0.1f*z));
+	// n = (-df/dx, 1, -df/dz)
+	XMFLOAT3 n(
+		-0.03f*z*cosf(0.1f*x) - 0.3f*cosf(0.1f*z),
+		1.0f,
+		-0.3f*sinf(0.1f*x) + 0.03f*x*sinf(0.1f*z));
 
-XMVECTOR unitNormal = XMVector3Normalize(XMLoadFloat3(&n));
-XMStoreFloat3(&n, unitNormal);
+	XMVECTOR unitNormal = XMVector3Normalize(XMLoadFloat3(&n));
+	XMStoreFloat3(&n, unitNormal);
 
-return n;
+	return n;
 }
-*/
 
 void BlurApp::BuildLandGeometryBuffers()
 {
