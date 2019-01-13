@@ -10,6 +10,11 @@
 
 namespace Vertex
 {
+	struct OnlyPos
+	{
+		DirectX::XMFLOAT3 Pos;
+	};
+
 	struct PosNormal
 	{
 		DirectX::XMFLOAT3 Pos;

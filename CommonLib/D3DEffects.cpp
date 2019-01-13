@@ -358,3 +358,50 @@ BlurEffect::~BlurEffect()
 	ReleaseCOM(InputMap);
 	ReleaseCOM(OutputMap);
 }
+
+TessellationEffect::TessellationEffect(ID3D11Device* device, const std::wstring& filename)
+	:Effect(device,filename)
+{
+	TessTech = mFX->GetTechniqueByName("Tess");
+
+	WorldViewProj = mFX->GetVariableByName("gWorldViewProj")->AsMatrix();
+	World = mFX->GetVariableByName("gWorld")->AsMatrix();
+	WorldInvTranspose = mFX->GetVariableByName("gWorldInvTranspose")->AsMatrix();
+	TexTransform = mFX->GetVariableByName("gTexTransform")->AsMatrix();
+	EyePosW = mFX->GetVariableByName("gEyePosW")->AsVector();
+	FogColor = mFX->GetVariableByName("gFogColor")->AsVector();
+	FogStart = mFX->GetVariableByName("gFogStart")->AsScalar();
+	FogRange = mFX->GetVariableByName("gFogRange")->AsScalar();
+	DirLights = mFX->GetVariableByName("gDirLights");
+	Mat = mFX->GetVariableByName("gMaterial");
+	DiffuseMap = mFX->GetVariableByName("gDiffuseMap")->AsShaderResource();
+
+	assert(TessTech->IsValid());
+	assert(WorldViewProj->IsValid());
+	assert(World->IsValid());
+	assert(WorldInvTranspose->IsValid());
+	assert(TexTransform->IsValid());
+	assert(EyePosW->IsValid());
+	assert(FogColor->IsValid());
+	assert(FogStart->IsValid());
+	assert(FogRange->IsValid());
+	assert(DirLights->IsValid());
+	assert(Mat->IsValid());
+	assert(DiffuseMap->IsValid());
+}
+
+TessellationEffect::~TessellationEffect()
+{
+	ReleaseCOM(TessTech);
+	ReleaseCOM(WorldViewProj);
+	ReleaseCOM(World);
+	ReleaseCOM(WorldInvTranspose);
+	ReleaseCOM(TexTransform);
+	ReleaseCOM(EyePosW);
+	ReleaseCOM(FogColor);
+	ReleaseCOM(FogStart);
+	ReleaseCOM(FogRange);
+	ReleaseCOM(DirLights);
+	ReleaseCOM(Mat);
+	ReleaseCOM(DiffuseMap);
+}

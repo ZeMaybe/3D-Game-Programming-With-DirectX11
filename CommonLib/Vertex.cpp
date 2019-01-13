@@ -48,6 +48,9 @@ void InputLayoutFactory::DestroyAllInputDesc()
 
 void InputLayoutFactory::InitAllInputDesc()
 {
+	InputLayoutDesc* OnlyPos = new InputLayoutDesc(L"OnlyPos", 1);
+	OnlyPos->mDesc[0] = {"POSITION",0,DXGI_FORMAT_R32G32B32_FLOAT,0,0,D3D11_INPUT_PER_VERTEX_DATA,0};
+
 	InputLayoutDesc* PosNormal = new InputLayoutDesc(L"PosNormal", 2);
 	PosNormal->mDesc[0] = { "POSITION",0,DXGI_FORMAT_R32G32B32_FLOAT,0,0,D3D11_INPUT_PER_VERTEX_DATA,0 };
 	PosNormal->mDesc[1] = { "NORMAL",0,DXGI_FORMAT_R32G32B32_FLOAT,0,12,D3D11_INPUT_PER_VERTEX_DATA,0 };
@@ -65,6 +68,7 @@ void InputLayoutFactory::InitAllInputDesc()
 	TreePointSprite->mDesc[0] = { "POSITION",0,DXGI_FORMAT_R32G32B32_FLOAT,0,0,D3D11_INPUT_PER_VERTEX_DATA,0 };
 	TreePointSprite->mDesc[1] = { "SIZE",0,DXGI_FORMAT_R32G32_FLOAT,0,12,D3D11_INPUT_PER_VERTEX_DATA,0 };
 	
+	mAllInputDesc.insert(InputPair(OnlyPos->mLayoutName, OnlyPos));
 	mAllInputDesc.insert(InputPair(PosNormal->mLayoutName,PosNormal));
 	mAllInputDesc.insert(InputPair(PosColor->mLayoutName, PosColor));
 	mAllInputDesc.insert(InputPair(PosNormalTexCod->mLayoutName, PosNormalTexCod));
