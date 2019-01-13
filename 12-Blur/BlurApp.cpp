@@ -4,7 +4,6 @@
 #include "GeometryGenerator.h"
 #include "WICTextureLoader.h"
 
-
 using namespace DirectX;
 
 BlurApp theApp;
@@ -134,7 +133,7 @@ void BlurApp::OnResize()
 
 	// Recreate the resources that depend on the client area size.
 	BuildOffscreenViews();
-	//mBlur.Init(md3dDevice, mClientWidth, mClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
+	mBlur.Init(md3dDevice, mClientWidth, mClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
 
 	// 更新投影Proj矩阵
 	XMMATRIX P = XMMatrixPerspectiveFovLH(0.25f*XM_PI, AspectRatio(), 1.0f, 1000.0f);
@@ -226,7 +225,7 @@ void BlurApp::DrawScene()
 	md3dImmediateContext->ClearRenderTargetView(mRenderTargetView, reinterpret_cast<const float*>(&Colors::Silver));
 	md3dImmediateContext->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-//	mBlur.BlurInPlace(md3dImmediateContext, mOffscreenSRV, mOffscreenUAV, 4);
+	mBlur.BlurInPlace(md3dImmediateContext, mOffscreenSRV, mOffscreenUAV, 1);
 
 	DrawScreenQuad();
 
@@ -412,7 +411,7 @@ void BlurApp::DrawScreenQuad()
 		mEffect01->SetWorldInvTranspose(identity);
 		mEffect01->SetWorldViewProj(identity);
 		mEffect01->SetTexTransform(identity);
-		mEffect01->SetDiffuseMap(mOffscreenSRV);   // 尚未做模糊
+		mEffect01->SetDiffuseMap(mBlur.GetBlurredOutput());   // 尚未做模糊
 
 		texOnlyTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
 		md3dImmediateContext->DrawIndexed(6, 0, 0);

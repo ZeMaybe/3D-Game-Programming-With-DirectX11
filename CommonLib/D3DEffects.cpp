@@ -332,3 +332,29 @@ VecAddEffect::~VecAddEffect()
 	ReleaseCOM(InputB);
 	ReleaseCOM(Output);
 }
+
+BlurEffect::BlurEffect(ID3D11Device* device, const std::wstring& filename)
+	:Effect(device,filename)
+{
+	HorzBlurTech = mFX->GetTechniqueByName("HorzBlur");
+	VertBlurTech = mFX->GetTechniqueByName("VertBlur");
+
+	Weights = mFX->GetVariableByName("gWeights")->AsScalar();
+	InputMap = mFX->GetVariableByName("gInput")->AsShaderResource();
+	OutputMap = mFX->GetVariableByName("gOutput")->AsUnorderedAccessView();
+
+	assert(HorzBlurTech->IsValid());
+	assert(VertBlurTech->IsValid());
+	assert(Weights->IsValid());
+	assert(InputMap->IsValid());
+	assert(OutputMap->IsValid());
+}
+
+BlurEffect::~BlurEffect()
+{
+	ReleaseCOM(HorzBlurTech);
+	ReleaseCOM(VertBlurTech);
+	ReleaseCOM(Weights);
+	ReleaseCOM(InputMap);
+	ReleaseCOM(OutputMap);
+}

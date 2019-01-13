@@ -8,6 +8,7 @@
 #include "LightHelper.h"
 #include "Vertex.h"
 #include "D3DEffects.h"
+#include "BlurFilter.h"
 
 enum RenderOptions
 {
@@ -74,7 +75,7 @@ private:
 	ID3D11InputLayout* mInputLayout = 0;
 	InputLayouts mInputLayouts;
 
-	//BlurFilter mBlur;
+	BlurFilter mBlur;
 	Waves mWaves;
 
 	// µ∆π‚”Î≤ƒ÷ 
