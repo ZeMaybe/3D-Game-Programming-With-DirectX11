@@ -13,13 +13,8 @@ public:
 	~LitSkullApp();
 
 	bool Init(HINSTANCE hinst);
-	void OnResize();
 	void UpdateScene(float dt);
 	void DrawScene();
-
-	void OnMouseDown(WPARAM btnState, int x, int y);
-	void OnMouseUp(WPARAM btnState, int x, int y);
-	void OnMouseMove(WPARAM btnState, int x, int y);
 
 private:
 	void BuildShapeGeometryBuffers();
@@ -45,8 +40,6 @@ private:
 	DirectX::XMFLOAT4X4 mBoxWorld;
 	DirectX::XMFLOAT4X4 mGridWorld;
 	DirectX::XMFLOAT4X4 mSkullWorld;
-	DirectX::XMFLOAT4X4 mView;
-	DirectX::XMFLOAT4X4 mProj;
 
 	BasicDirLightsEffect* mEffect =0;
 	ID3D11InputLayout* mLayout = 0;
@@ -69,15 +62,6 @@ private:
 	UINT mSkullIndexCount=0;
 
 	UINT mLightCount=1;
-
-	DirectX::XMFLOAT3 mEyePosW;
-
-
-	float mTheta;
-	float mPhi;
-	float mRadius;
-
-	POINT mLastMousePos;
 };
 
 #endif // LitSkullApp_h__

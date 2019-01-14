@@ -8,21 +8,12 @@ using namespace DirectX;
 CrateApp theApp;
 
 CrateApp::CrateApp()
-	:mEyePosW(0.0f, 0.0f, 0.0f),
-	mTheta(1.3f*XM_PI),
-	mPhi(0.4f*XM_PI),
-	mRadius(2.5f)
 {
 	mMainWndCaption = L"Crate Demo";
-
-	mLastMousePos.x = 0;
-	mLastMousePos.y = 0;
 
 	XMMATRIX I = XMMatrixIdentity();
 	XMStoreFloat4x4(&mBoxWorld, I);
 	XMStoreFloat4x4(&mTexTransform, I);
-	XMStoreFloat4x4(&mView, I);
-	XMStoreFloat4x4(&mProj, I);
 
 	mDirLights[0].Ambient = XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f);
 	mDirLights[0].Diffuse = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
@@ -57,9 +48,6 @@ bool CrateApp::Init(HINSTANCE hInstance)
 	mEffect = new BasicTextureEffect(md3dDevice, L"../FX/BasicTexture.fxo");
 	mInputLayout = mInputLayouts.InitLayout(md3dDevice,mEffect->Light1Tech , L"PosNormalTexCod");
 
-	//HR(D3DX11CreateShaderResourceViewFromFile(md3dDevice,
-	//	L"Textures/WoodCrate01.dds", 0, 0, &mDiffuseMapSRV, 0));
-
 	ID3D11Resource* res = 0; 
 	HR(CreateWICTextureFromFile(md3dDevice, L"../Textures/WoodCrate01.dds", &res, &mDiffuseMapSRV));
 	BuildGeometryBuffers();
@@ -68,32 +56,6 @@ bool CrateApp::Init(HINSTANCE hInstance)
 	return true;
 } 
 
-void CrateApp::OnResize()
-{
-	D3DApp::OnResize();
-
-	XMMATRIX P = XMMatrixPerspectiveFovLH(0.25f*XM_PI, AspectRatio(), 1.0f, 1000.0f);
-	XMStoreFloat4x4(&mProj, P);
-}
-
-void CrateApp::UpdateScene(float dt)
-{
-	// Convert Spherical to Cartesian coordinates.
-	float x = mRadius*sinf(mPhi)*cosf(mTheta);
-	float z = mRadius*sinf(mPhi)*sinf(mTheta);
-	float y = mRadius*cosf(mPhi);
-
-	mEyePosW = XMFLOAT3(x, y, z);
-
-	// Build the view matrix.
-	XMVECTOR pos = XMVectorSet(x, y, z, 1.0f);
-	XMVECTOR target = XMVectorZero();
-	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-
-	XMMATRIX V = XMMatrixLookAtLH(pos, target, up);
-	XMStoreFloat4x4(&mView, V);
-}
-
 void CrateApp::DrawScene()
 {
 	D3DApp::DrawScene();
@@ -101,12 +63,12 @@ void CrateApp::DrawScene()
 	md3dImmediateContext->IASetInputLayout(mInputLayout);
 	md3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	XMMATRIX view = XMLoadFloat4x4(&mView);
-	XMMATRIX proj = XMLoadFloat4x4(&mProj);
+	XMMATRIX view = mCam.View();
+	XMMATRIX proj = mCam.Proj();
 	XMMATRIX viewProj = view*proj;
 	
 	mEffect->SetDirLights(mDirLights);
-	mEffect->SetEyePosW(mEyePosW);
+	mEffect->SetEyePosW(mCam.GetPosition());
 
 	ID3DX11EffectTechnique* activeTech = mEffect->Light2TexTech; 
 	D3DX11_TECHNIQUE_DESC techDesc;
@@ -138,51 +100,6 @@ void CrateApp::DrawScene()
 
 	HR(mSwapChain->Present(0, 0)); 
 }
-
-void CrateApp::OnMouseDown(WPARAM btnState, int x, int y)
-{
-	mLastMousePos.x = x;
-	mLastMousePos.y = y;
-
-	SetCapture(mhMainWnd);
-}
-
-void CrateApp::OnMouseUp(WPARAM btnState, int x, int y)
-{
-	ReleaseCapture(); 
-}
-
-void CrateApp::OnMouseMove(WPARAM btnState, int x, int y)
-{ 
-	if ((btnState & MK_LBUTTON) != 0)
-	{
-		// Make each pixel correspond to a quarter of a degree.
-		float dx = XMConvertToRadians(0.25f*static_cast<float>(x - mLastMousePos.x));
-		float dy = XMConvertToRadians(0.25f*static_cast<float>(y - mLastMousePos.y));
-
-		// Update angles based on input to orbit camera around box.
-		mTheta += dx;
-		mPhi += dy;
-
-		// Restrict the angle mPhi.
-		mPhi = MathHelper::Clamp(mPhi, 0.1f, XM_PI - 0.1f);
-	}
-	else if ((btnState & MK_RBUTTON) != 0)
-	{
-		// Make each pixel correspond to 0.01 unit in the scene.
-		float dx = 0.01f*static_cast<float>(x - mLastMousePos.x);
-		float dy = 0.01f*static_cast<float>(y - mLastMousePos.y);
-
-		// Update the camera radius based on input.
-		mRadius += dx - dy;
-
-		// Restrict the radius.
-		mRadius = MathHelper::Clamp(mRadius, 1.0f, 15.0f);
-	}
-
-	mLastMousePos.x = x;
-	mLastMousePos.y = y;
-} 
 
 void CrateApp::BuildGeometryBuffers()
 {

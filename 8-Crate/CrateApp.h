@@ -13,13 +13,7 @@ public:
 	~CrateApp();
 
 	bool Init(HINSTANCE hInstance);
-	void OnResize();
-	void UpdateScene(float dt);
 	void DrawScene();
-
-	void OnMouseDown(WPARAM btnState, int x, int y);
-	void OnMouseUp(WPARAM btnState, int x, int y);
-	void OnMouseMove(WPARAM btnState, int x, int y);
 
 private:
 	void BuildGeometryBuffers();
@@ -42,22 +36,9 @@ private:
 	DirectX::XMFLOAT4X4 mTexTransform;
 	DirectX::XMFLOAT4X4 mBoxWorld;
 
-	DirectX::XMFLOAT4X4 mView;
-	DirectX::XMFLOAT4X4 mProj;
-
 	int mBoxVertexOffset;
 	UINT mBoxIndexOffset;
 	UINT mBoxIndexCount;
-
-	DirectX::XMFLOAT3 mEyePosW;
-
-	float mTheta;
-	float mPhi;
-	float mRadius;
-
-	POINT mLastMousePos;
 };
-
-
 
 #endif // CrateApp_h__

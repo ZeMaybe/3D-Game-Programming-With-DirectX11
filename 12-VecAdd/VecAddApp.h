@@ -37,7 +37,6 @@ private:
 
 	VecAddEffect* mEffect =0;
 
-
 	UINT mNumElements;
 };
 

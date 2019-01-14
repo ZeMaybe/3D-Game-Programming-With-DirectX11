@@ -14,13 +14,8 @@ public:
 	~TexturedHillsAndWavesApp(); 
 
 	bool Init(HINSTANCE hinst);
-	void OnResize();
 	void UpdateScene(float dt);
 	void DrawScene();
-
-	void OnMouseDown(WPARAM btnState, int x, int y);
-	void OnMouseUp(WPARAM btnState, int x, int y);
-	void OnMouseMove(WPARAM btnState, int x, int y); 
 
 private:
 	float GetHillHeight(float x, float z)const;
@@ -53,19 +48,7 @@ private:
 	DirectX::XMFLOAT4X4 mLandWorld;
 	DirectX::XMFLOAT4X4 mWavesWorld;
 
-	DirectX::XMFLOAT4X4 mView;
-	DirectX::XMFLOAT4X4 mProj;
-
 	UINT mLandIndexCount;
 	DirectX::XMFLOAT2 mWaterTexOffset;
-
-	DirectX::XMFLOAT3 mEyePosW;
-
-	float mTheta;
-	float mPhi;
-	float mRadius;
-
-	POINT mLastMousePos;
-
 }; 
 #endif // TexturedHillsAndWavesApp_h__
