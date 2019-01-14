@@ -7,19 +7,11 @@ using namespace DirectX;
 HillsApp theApp;
 
 HillsApp::HillsApp()
-	:mTheta(1.5f*XM_PI)
-	, mPhi(0.1f*XM_PI)
-	, mRadius(200.0f)
 {
 	mMainWndCaption = L"Hills Demo";
 
-	mLastMousePos.x = 0;
-	mLastMousePos.y = 0;
-
 	XMMATRIX I = XMMatrixIdentity();
 	XMStoreFloat4x4(&mGridWorld, I);
-	XMStoreFloat4x4(&mView, I);
-	XMStoreFloat4x4(&mProj, I);
 } 
 
 HillsApp::~HillsApp()
@@ -41,31 +33,8 @@ bool HillsApp::Init(HINSTANCE hInstance)
 	mEffect = new PosColorEffect(md3dDevice, L"../FX/Color.fxo");
 	mInputLayout = mInputLayouts.InitLayout(md3dDevice, mEffect->ColorTech, L"PosColor");
 
+	mCam.SetPosition(0, 30, -30);
 	return true;
-}
-
-void HillsApp::OnResize()
-{
-	D3DApp::OnResize();
-
-	XMMATRIX P = XMMatrixPerspectiveFovLH(0.25f*XM_PI, AspectRatio(), 1.0f, 1000.0f);
-	XMStoreFloat4x4(&mProj, P);
-}
-
-void HillsApp::UpdateScene(float dt)
-{
-	// Convert Spherical to Cartesian coordinates.
-	float x = mRadius*sinf(mPhi)*cosf(mTheta);
-	float z = mRadius*sinf(mPhi)*sinf(mTheta);
-	float y = mRadius*cosf(mPhi);
-
-	// Build the view matrix.
-	XMVECTOR pos = XMVectorSet(x, y, z, 1.0f);
-	XMVECTOR target = XMVectorZero();
-	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-
-	XMMATRIX V = XMMatrixLookAtLH(pos, target, up);
-	XMStoreFloat4x4(&mView, V);
 }
 
 void HillsApp::DrawScene()
@@ -75,8 +44,8 @@ void HillsApp::DrawScene()
 	md3dImmediateContext->IASetInputLayout(mInputLayout);
 	md3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	XMMATRIX view = XMLoadFloat4x4(&mView);
-	XMMATRIX proj = XMLoadFloat4x4(&mProj);
+	XMMATRIX view = mCam.View();
+	XMMATRIX proj = mCam.Proj();
 	XMMATRIX world = XMLoadFloat4x4(&mGridWorld);
 	XMMATRIX worldViewProj = world*view*proj;
 
@@ -96,51 +65,6 @@ void HillsApp::DrawScene()
 	}
 
 	HR(mSwapChain->Present(0, 0));
-}
-
-void HillsApp::OnMouseDown(WPARAM btnState, int x, int y)
-{
-	mLastMousePos.x = x;
-	mLastMousePos.y = y;
-
-	SetCapture(mhMainWnd);
-}
-
-void HillsApp::OnMouseUp(WPARAM btnState, int x, int y)
-{
-	ReleaseCapture(); 
-}
-
-void HillsApp::OnMouseMove(WPARAM btnState, int x, int y)
-{
-	if ((btnState & MK_LBUTTON) != 0)
-	{
-		// Make each pixel correspond to a quarter of a degree.
-		float dx = XMConvertToRadians(0.25f*static_cast<float>(x - mLastMousePos.x));
-		float dy = XMConvertToRadians(0.25f*static_cast<float>(y - mLastMousePos.y));
-
-		// Update angles based on input to orbit camera around box.
-		mTheta += dx;
-		mPhi += dy;
-
-		// Restrict the angle mPhi.
-		mPhi = MathHelper::Clamp(mPhi, 0.1f, XM_PI - 0.1f);
-	}
-	else if ((btnState & MK_RBUTTON) != 0)
-	{
-		// Make each pixel correspond to 0.2 unit in the scene.
-		float dx = 0.2f*static_cast<float>(x - mLastMousePos.x);
-		float dy = 0.2f*static_cast<float>(y - mLastMousePos.y);
-
-		// Update the camera radius based on input.
-		mRadius += dx - dy;
-
-		// Restrict the radius.
-		mRadius = MathHelper::Clamp(mRadius, 50.0f, 500.0f);
-	}
-
-	mLastMousePos.x = x;
-	mLastMousePos.y = y;
 }
 
 void HillsApp::BuildGeometryBuffers()

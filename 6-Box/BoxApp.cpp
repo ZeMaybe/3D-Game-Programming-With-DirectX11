@@ -6,19 +6,11 @@ using namespace DirectX;
 BoxApp theApp;
 
 BoxApp::BoxApp()
-	:mTheta(1.5f*XM_PI)
-	,mPhi(0.25f*XM_PI)
-	,mRadius(5.0f)
 {
 	mMainWndCaption = L"Box Demo";
 
-	mLastMousePos.x = 0;
-	mLastMousePos.y = 0;
-
 	XMMATRIX I = XMMatrixIdentity();
 	XMStoreFloat4x4(&mWorld, I);
-	XMStoreFloat4x4(&mView, I);
-	XMStoreFloat4x4(&mProj, I);
 }
 
 BoxApp::~BoxApp()
@@ -40,34 +32,7 @@ bool BoxApp::Init(HINSTANCE hinst)
 	mInputLayout = mInputLayouts.InitLayout(md3dDevice, mEffect->ColorTech, L"PosColor");
 
 	return true;
-}
-
-void BoxApp::OnResize()
-{
-	D3DApp::OnResize();
-
-	XMMATRIX p = XMMatrixPerspectiveFovLH(0.25*XM_PI, AspectRatio(), 1.0f, 1000.0f);
-	XMStoreFloat4x4(&mProj, p);
-}
-
-void BoxApp::UpdateScene(float dt)
-{
-	// Convert Spherical to Cartesian coordinates.  
-	// 球面坐标转笛卡尔坐标,
-	// phi   -- op和y轴正向之间的夹角,
-	// theta -- op在xz平面上的投影和x轴正向间的夹角
-	float x = mRadius * sinf(mPhi)*cosf(mTheta);
-	float z = mRadius * sinf(mPhi)*sinf(mTheta);
-	float y = mRadius * cosf(mPhi);
-
-	// Build the view matrix.
-	XMVECTOR pos = XMVectorSet(x, y, z, 1.0f);
-	XMVECTOR target = XMVectorZero();
-	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-
-	XMMATRIX V = XMMatrixLookAtLH(pos, target, up);
-	XMStoreFloat4x4(&mView, V);
-}
+} 
 
 void BoxApp::DrawScene()
 {
@@ -77,8 +42,8 @@ void BoxApp::DrawScene()
 	md3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	XMMATRIX world = XMLoadFloat4x4(&mWorld);
-	XMMATRIX view = XMLoadFloat4x4(&mView);
-	XMMATRIX proj = XMLoadFloat4x4(&mProj);
+	XMMATRIX view = mCam.View();
+	XMMATRIX proj = mCam.Proj();
 	XMMATRIX worldViewProj = world * view*proj;
 
 	UINT stride = sizeof(Vertex::PosColor);
@@ -101,55 +66,7 @@ void BoxApp::DrawScene()
 
 	HR(mSwapChain->Present(0, 0));
 }
-
-void BoxApp::OnMouseDown(WPARAM btnState, int x, int y)
-{
-	mLastMousePos.x = x;
-	mLastMousePos.y = y;
-
-	SetCapture(mhMainWnd);
-}
-
-void BoxApp::OnMouseUp(WPARAM btnState, int x, int y)
-{
-	ReleaseCapture(); 
-}
-
-void BoxApp::OnMouseMove(WPARAM btnState, int x, int y)
-{
-	if ((btnState & MK_LBUTTON) != 0)
-	{
-		// Make each pixel correspond to a quarter of a degree.
-		float dx = XMConvertToRadians(0.25f*static_cast<float>(x - mLastMousePos.x));
-		float dy = XMConvertToRadians(0.25f*static_cast<float>(y - mLastMousePos.y));
-
-		// Update angles based on input to orbit camera around box.
-		//mTheta += dx;
-		//mPhi   += dy;
-
-		mTheta -= dx;
-		mPhi -= dy;
-
-		// Restrict the angle mPhi.
-		mPhi = MathHelper::Clamp(mPhi, 0.1f, XM_PI - 0.1f);
-	}
-	else if ((btnState & MK_RBUTTON) != 0)
-	{
-		// Make each pixel correspond to 0.005 unit in the scene.
-		float dx = 0.005f*static_cast<float>(x - mLastMousePos.x);
-		float dy = 0.005f*static_cast<float>(y - mLastMousePos.y);
-
-		// Update the camera radius based on input.
-		mRadius += dx - dy;
-
-		// Restrict the radius.
-		mRadius = MathHelper::Clamp(mRadius, 3.0f, 15.0f);
-	}
-
-	mLastMousePos.x = x;
-	mLastMousePos.y = y;
-}
-
+ 
 void BoxApp::BuildGeometryBuffers()
 {
 	// Create vertex buffer

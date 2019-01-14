@@ -13,13 +13,7 @@ public:
 	~SkullApp();
 
 	bool Init(HINSTANCE hInstance);
-	void OnResize();
-	void UpdateScene(float dt);
 	void DrawScene();
-
-	void OnMouseDown(WPARAM btnState, int x, int y);
-	void OnMouseUp(WPARAM btnState, int x, int y);
-	void OnMouseMove(WPARAM btnState, int x, int y);
 
 private:
 	void BuildGeometryBuffers();
@@ -40,14 +34,6 @@ private:
 
 	// Define transformations from local spaces to world space.
 	DirectX::XMFLOAT4X4 mSkullWorld;
-	DirectX::XMFLOAT4X4 mView;
-	DirectX::XMFLOAT4X4 mProj;
-
-	float mTheta;
-	float mPhi;
-	float mRadius;
-
-	POINT mLastMousePos;
 };
 
 #endif // SkullApp_h__

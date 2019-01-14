@@ -15,21 +15,14 @@ public:
 	~LightingApp();
 
 	bool Init(HINSTANCE hinst);
-	void OnResize();
 	void UpdateScene(float dt);
 	void DrawScene(); 
-
-	void OnMouseDown(WPARAM btnState, int x, int y);
-	void OnMouseUp(WPARAM btnState, int x, int y);
-	void OnMouseMove(WPARAM btnState, int x, int y);
 
 private:
 	float GetHillHeight(float x, float z)const;
 	DirectX::XMFLOAT3 GetHillNormal(float x, float z)const;
 	void BuildLandGeometryBuffers();
 	void BuildWaveGeometryBuffers();
-	//void BuildFX();
-	//void BuildVertexLayout();
 
 private:
 	ID3D11Buffer* mLandVB = 0;
@@ -49,20 +42,10 @@ private:
 
 	DirectX::XMFLOAT4X4 mLandWorld;
 	DirectX::XMFLOAT4X4 mWavesWorld;
-	DirectX::XMFLOAT4X4 mView;
-	DirectX::XMFLOAT4X4 mProj;
 
 	DirPointSpotLightsEffect* mEffect=0;
 	ID3D11InputLayout* mInputLayout = 0;
 	InputLayouts mInputLayouts;
-
-	DirectX::XMFLOAT3 mEyePosW;
-
-	float mTheta;
-	float mPhi;
-	float mRadius;
-
-	POINT mLastMousePos;
 }; 
 
 #endif // LightingApp_h__

@@ -7,21 +7,13 @@ using namespace DirectX;
 LightingApp theApp;
 
 LightingApp::LightingApp()
-	:mEyePosW(0.0f, 0.0f, 0.0f)
-	, mTheta(1.5f*XM_PI)
-	, mPhi(0.1f*XM_PI)
-	, mRadius(80.0f)
 {
 	mMainWndCaption = L"Lighting Demo";
-
-	mLastMousePos.x = 0;
-	mLastMousePos.y = 0;
 
 	XMMATRIX I = XMMatrixIdentity();
 	XMStoreFloat4x4(&mLandWorld, I);
 	XMStoreFloat4x4(&mWavesWorld, I);
-	XMStoreFloat4x4(&mView, I);
-	XMStoreFloat4x4(&mProj, I);
+
 	XMMATRIX wavesOffset = XMMatrixTranslation(0.0f, -3.0f, 0.0f);
 	XMStoreFloat4x4(&mWavesWorld, wavesOffset);
 
@@ -81,28 +73,9 @@ bool LightingApp::Init(HINSTANCE hinst)
 	return true;
 }
 
-void LightingApp::OnResize()
-{
-	D3DApp::OnResize();
-
-	XMMATRIX P = XMMatrixPerspectiveFovLH(0.25f*XM_PI, AspectRatio(), 1.0f, 1000.0f);
-	XMStoreFloat4x4(&mProj, P);
-}
-
 void LightingApp::UpdateScene(float dt)
 {
-	// Convert Spherical to Cartesian coordinates.
-	float x = mRadius*sinf(mPhi)*cosf(mTheta);
-	float z = mRadius*sinf(mPhi)*sinf(mTheta);
-	float y = mRadius*cosf(mPhi);
-	mEyePosW = XMFLOAT3(x, y, z);
-
-	// Build the view matrix.
-	XMVECTOR pos = XMVectorSet(x, y, z, 1.0f);
-	XMVECTOR target = XMVectorZero();
-	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-	XMMATRIX V = XMMatrixLookAtLH(pos, target, up);
-	XMStoreFloat4x4(&mView, V);
+	D3DApp::UpdateScene(dt);
 
 	// Every quarter second, generate a random wave.
 	static float t_base = 0.0f;
@@ -141,8 +114,8 @@ void LightingApp::UpdateScene(float dt)
 	// The spotlight takes on the camera position and is aimed in the
 	// same direction the camera is looking.  In this way, it looks
 	// like we are holding a flashlight.
-	mSpotLight.Position = mEyePosW;
-	XMStoreFloat3(&mSpotLight.Direction, XMVector3Normalize(target - pos));
+	mSpotLight.Position = mCam.GetPosition();
+	XMStoreFloat3(&mSpotLight.Direction, XMVector3Normalize(mCam.GetLookXM()));
 }
 
 void LightingApp::DrawScene()
@@ -152,14 +125,14 @@ void LightingApp::DrawScene()
 	md3dImmediateContext->IASetInputLayout(mInputLayout);
 	md3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	XMMATRIX view = XMLoadFloat4x4(&mView);
-	XMMATRIX proj = XMLoadFloat4x4(&mProj);
+	XMMATRIX view = mCam.View();
+	XMMATRIX proj = mCam.Proj();
 	XMMATRIX viewProj = view*proj;
 
 	mEffect->SetDirLit(mDirLight);
 	mEffect->SetPointLit(mPointLight);
 	mEffect->SetSpotLit(mSpotLight);
-	mEffect->SetEyePosW(mEyePosW);
+	mEffect->SetEyePosW(mCam.GetPosition());
 
 	UINT stride = sizeof(Vertex::PosNormal);
 	UINT offset = 0;
@@ -204,51 +177,6 @@ void LightingApp::DrawScene()
 		md3dImmediateContext->DrawIndexed(3 * mWaves.TriangleCount(), 0, 0);
 	}
 	HR(mSwapChain->Present(0, 0));
-}
-
-void LightingApp::OnMouseDown(WPARAM btnState, int x, int y)
-{
-	mLastMousePos.x = x;
-	mLastMousePos.y = y;
-
-	SetCapture(mhMainWnd);
-}
-
-void LightingApp::OnMouseUp(WPARAM btnState, int x, int y)
-{
-	ReleaseCapture();
-}
-
-void LightingApp::OnMouseMove(WPARAM btnState, int x, int y)
-{
-	if ((btnState & MK_LBUTTON) != 0)
-	{
-		// Make each pixel correspond to a quarter of a degree.
-		float dx = XMConvertToRadians(0.25f*static_cast<float>(x - mLastMousePos.x));
-		float dy = XMConvertToRadians(0.25f*static_cast<float>(y - mLastMousePos.y));
-
-		// Update angles based on input to orbit camera around box.
-		mTheta += dx;
-		mPhi += dy;
-
-		// Restrict the angle mPhi.
-		mPhi = MathHelper::Clamp(mPhi, 0.1f, XM_PI - 0.1f);
-	}
-	else if ((btnState & MK_RBUTTON) != 0)
-	{
-		// Make each pixel correspond to 0.2 unit in the scene.
-		float dx = 0.2f*static_cast<float>(x - mLastMousePos.x);
-		float dy = 0.2f*static_cast<float>(y - mLastMousePos.y);
-
-		// Update the camera radius based on input.
-		mRadius += dx - dy;
-
-		// Restrict the radius.
-		mRadius = MathHelper::Clamp(mRadius, 50.0f, 500.0f);
-	}
-
-	mLastMousePos.x = x;
-	mLastMousePos.y = y;
 }
 
 float LightingApp::GetHillHeight(float x, float z)const

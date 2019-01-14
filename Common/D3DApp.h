@@ -4,6 +4,7 @@
 
 #include "D3DUtil.h"
 #include "GameTimer.h"
+#include "Camera.h"
 #include <string>
 
 class D3DApp
@@ -25,14 +26,14 @@ public:
 
 	virtual bool Init(HINSTANCE hinst);
 	virtual void OnResize();
-	virtual void UpdateScene(float dt) = 0;
+	virtual void UpdateScene(float dt);
 	virtual void DrawScene();
 	virtual LRESULT MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	// Convenience overrides for handling mouse input.
-	virtual void OnMouseDown(WPARAM btnState, int x, int y) { }
-	virtual void OnMouseUp(WPARAM btnState, int x, int y) { }
-	virtual void OnMouseMove(WPARAM btnState, int x, int y) { }
+	virtual void OnMouseDown(WPARAM btnState, int x, int y);
+	virtual void OnMouseUp(WPARAM btnState, int x, int y);
+	virtual void OnMouseMove(WPARAM btnState, int x, int y);
 
 protected:
 	bool InitMainWindow(HINSTANCE hInst);
@@ -69,6 +70,8 @@ protected:
 	int mClientHeight = 600;
 	bool mEnable4xMsaa = false;
 
+	Camera mCam; 
+	POINT mLastMousePos; 
 private:
 	static D3DApp* mApplication;
 };

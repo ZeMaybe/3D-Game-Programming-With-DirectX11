@@ -14,13 +14,7 @@ public:
 	~BoxApp();
 
 	bool Init(HINSTANCE hinst);
-	void OnResize();
-	void UpdateScene(float dt);
 	void DrawScene();
-
-	void OnMouseDown(WPARAM btnState, int x, int y);
-	void OnMouseUp(WPARAM btnState, int x, int y);
-	void OnMouseMove(WPARAM btnState, int x, int y);
 
 private:
 	void BuildGeometryBuffers();
@@ -34,18 +28,6 @@ private:
 	InputLayouts mInputLayouts;
 
 	DirectX::XMFLOAT4X4 mWorld;
-	DirectX::XMFLOAT4X4 mView;
-	DirectX::XMFLOAT4X4 mProj;
-
-	float mTheta;
-	float mPhi;
-	float mRadius;
-
-	POINT mLastMousePos;
 };
-
-
-
-
 
 #endif // BoxApp_h__

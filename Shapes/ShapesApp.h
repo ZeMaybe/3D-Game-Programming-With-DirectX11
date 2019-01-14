@@ -4,8 +4,8 @@
 
 #include "D3DApp.h" 
 #include "D3DEffects.h"
-#include "Vertex.h"
- 
+#include "Vertex.h" 
+
 class ShapesApp : public D3DApp
 {
 public:
@@ -13,13 +13,7 @@ public:
 	~ShapesApp();
 
 	bool Init(HINSTANCE hInstance);
-	void OnResize();
-	void UpdateScene(float dt);
-	void DrawScene();
-
-	void OnMouseDown(WPARAM btnState, int x, int y);
-	void OnMouseUp(WPARAM btnState, int x, int y);
-	void OnMouseMove(WPARAM btnState, int x, int y);
+	void DrawScene(); 
 
 private:
 	void BuildGeometryBuffers();
@@ -41,9 +35,6 @@ private:
 	DirectX::XMFLOAT4X4 mBoxWorld;
 	DirectX::XMFLOAT4X4 mCenterSphereWorld;
 
-	DirectX::XMFLOAT4X4 mView;
-	DirectX::XMFLOAT4X4 mProj;
-
 	int mBoxVertexOffset;
 	int mGridVertexOffset;
 	int mSphereVertexOffset;
@@ -57,13 +48,7 @@ private:
 	UINT mBoxIndexCount;
 	UINT mGridIndexCount;
 	UINT mSphereIndexCount;
-	UINT mCylinderIndexCount;
-
-	float mTheta;
-	float mPhi;
-	float mRadius;
-
-	POINT mLastMousePos;
+	UINT mCylinderIndexCount;   
 };
 
 #endif // ShapesApp_h__

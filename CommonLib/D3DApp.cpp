@@ -19,7 +19,10 @@ D3DApp::D3DApp()
 	:mMainWndCaption(L"D3D11 Application")
 {
 	mApplication = this;
-	ZeroMemory(&mScreenViewport, sizeof(D3D11_VIEWPORT));
+	ZeroMemory(&mScreenViewport, sizeof(D3D11_VIEWPORT)); 
+
+	mLastMousePos.x = 0;
+	mLastMousePos.y = 0;
 }
 
 D3DApp::~D3DApp()
@@ -100,6 +103,8 @@ bool D3DApp::Init(HINSTANCE hinst)
 	if (!InitDirect3D())
 		return false;
 
+	mCam.SetPosition(0.0f, 0.0f, -15.0f);
+
 	return true;
 }
 
@@ -164,13 +169,31 @@ void D3DApp::OnResize()
 	mScreenViewport.MaxDepth = 1.0f;
 
 	md3dImmediateContext->RSSetViewports(1, &mScreenViewport);
+
+	mCam.SetLens(0.25f*XM_PI, AspectRatio(), 1.0f, 1000.0f);
 }
 
 
+void D3DApp::UpdateScene(float dt)
+{
+	if (GetAsyncKeyState('W') & 0x8000)
+		mCam.Walk(10.0f*dt);
+
+	if (GetAsyncKeyState('S') & 0x8000)
+		mCam.Walk(-10.0f*dt);
+
+	if (GetAsyncKeyState('A') & 0x8000)
+		mCam.Strafe(-10.0f*dt);
+
+	if (GetAsyncKeyState('D') & 0x8000)
+		mCam.Strafe(10.0f*dt);
+}
+
 void D3DApp::DrawScene()
 {
-	md3dImmediateContext->ClearRenderTargetView(mRenderTargetView, reinterpret_cast<const float*>(&Colors::Black));
+	md3dImmediateContext->ClearRenderTargetView(mRenderTargetView, reinterpret_cast<const float*>(&Colors::Silver));
 	md3dImmediateContext->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
+	mCam.UpdateViewMatrix();
 }
 
 LRESULT D3DApp::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -290,6 +313,34 @@ LRESULT D3DApp::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	}
 
 	return DefWindowProc(hwnd, msg, wParam, lParam);
+}
+
+void D3DApp::OnMouseDown(WPARAM btnState, int x, int y)
+{
+	mLastMousePos.x = x;
+	mLastMousePos.y = y;
+
+	SetCapture(mhMainWnd);
+}
+
+void D3DApp::OnMouseUp(WPARAM btnState, int x, int y)
+{
+	ReleaseCapture(); 
+}
+
+void D3DApp::OnMouseMove(WPARAM btnState, int x, int y)
+{
+	if ((btnState & MK_LBUTTON) != 0)
+	{
+		// Make each pixel correspond to a quarter of a degree.
+		float dx = XMConvertToRadians(0.25f*static_cast<float>(x - mLastMousePos.x));
+		float dy = XMConvertToRadians(0.25f*static_cast<float>(y - mLastMousePos.y));
+
+		mCam.Pitch(dy);
+		mCam.RotateY(dx);
+	}
+	mLastMousePos.x = x;
+	mLastMousePos.y = y;
 }
 
 bool D3DApp::InitMainWindow(HINSTANCE hInst)

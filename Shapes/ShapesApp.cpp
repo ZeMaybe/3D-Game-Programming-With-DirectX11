@@ -6,19 +6,12 @@ using namespace DirectX;
 
 ShapesApp theApp;
 
-ShapesApp::ShapesApp()
-	:mTheta(1.5f*XM_PI)
-	,mPhi(0.1f*XM_PI)
-	,mRadius(15.0f)
+ShapesApp::ShapesApp() 
 {
 	mMainWndCaption = L"Shapes Demo";
-	mLastMousePos.x = 0;
-	mLastMousePos.y = 0;
 
 	XMMATRIX I = XMMatrixIdentity();
-	XMStoreFloat4x4(&mGridWorld, I);
-	XMStoreFloat4x4(&mView, I);
-	XMStoreFloat4x4(&mProj, I);
+	XMStoreFloat4x4(&mGridWorld, I); 
 
 	XMMATRIX boxScale = XMMatrixScaling(2.0f, 1.0f, 2.0f);
 	XMMATRIX boxOffset = XMMatrixTranslation(0.0f, 0.5f, 0.0f);
@@ -35,7 +28,7 @@ ShapesApp::ShapesApp()
 
 		XMStoreFloat4x4(&mSphereWorld[i * 2 + 0], XMMatrixTranslation(-5.0f, 3.5f, -10.0f + i*5.0f));
 		XMStoreFloat4x4(&mSphereWorld[i * 2 + 1], XMMatrixTranslation(+5.0f, 3.5f, -10.0f + i*5.0f));
-	}
+	} 
 }
 
 ShapesApp::~ShapesApp()
@@ -59,32 +52,8 @@ bool ShapesApp::Init(HINSTANCE hInstance)
 	BuildRasterizerState(); 
 
 	return true;
-}
-
-void ShapesApp::OnResize()
-{
-	D3DApp::OnResize();
-
-	XMMATRIX P = XMMatrixPerspectiveFovLH(0.25f*XM_PI, AspectRatio(), 1.0f, 1000.0f);
-	XMStoreFloat4x4(&mProj, P);
-}
-
-void ShapesApp::UpdateScene(float dt)
-{
-	// Convert Spherical to Cartesian coordinates.
-	float x = mRadius*sinf(mPhi)*cosf(mTheta);
-	float z = mRadius*sinf(mPhi)*sinf(mTheta);
-	float y = mRadius*cosf(mPhi);
-
-	// Build the view matrix.
-	XMVECTOR pos = XMVectorSet(x, y, z, 1.0f);
-	XMVECTOR target = XMVectorZero();
-	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-
-	XMMATRIX V = XMMatrixLookAtLH(pos, target, up);
-	XMStoreFloat4x4(&mView, V);
-}
-
+} 
+ 
 void ShapesApp::DrawScene()
 {
 	D3DApp::DrawScene();
@@ -93,9 +62,9 @@ void ShapesApp::DrawScene()
 	md3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	md3dImmediateContext->RSSetState(mWireframeRS);
 
-	XMMATRIX view = XMLoadFloat4x4(&mView);
-	XMMATRIX proj = XMLoadFloat4x4(&mProj);
-	XMMATRIX viewProj = view*proj;
+	XMMATRIX view = mCam.View();
+	XMMATRIX proj = mCam.Proj();
+	XMMATRIX viewProj = mCam.ViewProj();
 
 	UINT stride = sizeof(Vertex::PosColor);
 	UINT offset = 0;
@@ -144,52 +113,7 @@ void ShapesApp::DrawScene()
 	}
 
 	HR(mSwapChain->Present(0, 0));
-}
-
-void ShapesApp::OnMouseDown(WPARAM btnState, int x, int y)
-{
-	mLastMousePos.x = x;
-	mLastMousePos.y = y;
-
-	SetCapture(mhMainWnd);
-}
-
-void ShapesApp::OnMouseUp(WPARAM btnState, int x, int y)
-{
-	ReleaseCapture();
-}
-
-void ShapesApp::OnMouseMove(WPARAM btnState, int x, int y)
-{
-	if ((btnState & MK_LBUTTON) != 0)
-	{
-		// Make each pixel correspond to a quarter of a degree.
-		float dx = XMConvertToRadians(0.25f*static_cast<float>(x - mLastMousePos.x));
-		float dy = XMConvertToRadians(0.25f*static_cast<float>(y - mLastMousePos.y));
-
-		// Update angles based on input to orbit camera around box.
-		mTheta += dx;
-		mPhi += dy;
-
-		// Restrict the angle mPhi.
-		mPhi = MathHelper::Clamp(mPhi, 0.1f, XM_PI - 0.1f);
-	}
-	else if ((btnState & MK_RBUTTON) != 0)
-	{
-		// Make each pixel correspond to 0.01 unit in the scene.
-		float dx = 0.01f*static_cast<float>(x - mLastMousePos.x);
-		float dy = 0.01f*static_cast<float>(y - mLastMousePos.y);
-
-		// Update the camera radius based on input.
-		mRadius += dx - dy;
-
-		// Restrict the radius.
-		mRadius = MathHelper::Clamp(mRadius, 3.0f, 200.0f);
-	}
-
-	mLastMousePos.x = x;
-	mLastMousePos.y = y;
-}
+} 
 
 void ShapesApp::BuildGeometryBuffers()
 {

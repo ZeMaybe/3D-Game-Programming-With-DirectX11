@@ -8,17 +8,8 @@ using namespace DirectX;
 SkullApp theApp;
 
 SkullApp::SkullApp()
-	:mTheta(1.5f*XM_PI)
-	,mPhi(0.1f*XM_PI)
-	,mRadius(20.0f)
 {
 	mMainWndCaption = L"Skull Demo";
-	mLastMousePos.x = 0;
-	mLastMousePos.y = 0;
-	
-	XMMATRIX I = XMMatrixIdentity();
-	XMStoreFloat4x4(&mView, I);
-	XMStoreFloat4x4(&mProj, I);
 
 	XMMATRIX T = XMMatrixTranslation(0.0f, -2.0f, 0.0f);
 	XMStoreFloat4x4(&mSkullWorld, T);
@@ -45,31 +36,7 @@ bool SkullApp::Init(HINSTANCE hInstance)
 	BuildRasterizerState();
 
 	return true;
-}
-
-void SkullApp::OnResize()
-{
-	D3DApp::OnResize();
-
-	XMMATRIX P = XMMatrixPerspectiveFovLH(0.25f*XM_PI, AspectRatio(), 1.0f, 1000.0f);
-	XMStoreFloat4x4(&mProj, P);
-}
-
-void SkullApp::UpdateScene(float dt)
-{
-	// Convert Spherical to Cartesian coordinates.
-	float x = mRadius*sinf(mPhi)*cosf(mTheta);
-	float z = mRadius*sinf(mPhi)*sinf(mTheta);
-	float y = mRadius*cosf(mPhi);
-
-	// Build the view matrix.
-	XMVECTOR pos = XMVectorSet(x, y, z, 1.0f);
-	XMVECTOR target = XMVectorZero();
-	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-
-	XMMATRIX V = XMMatrixLookAtLH(pos, target, up);
-	XMStoreFloat4x4(&mView, V);
-}
+} 
 
 void SkullApp::DrawScene()
 {
@@ -79,8 +46,8 @@ void SkullApp::DrawScene()
 	md3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	md3dImmediateContext->RSSetState(mWireframeRS);
 
-	XMMATRIX view = XMLoadFloat4x4(&mView);
-	XMMATRIX proj = XMLoadFloat4x4(&mProj);
+	XMMATRIX view = mCam.View();
+	XMMATRIX proj = mCam.Proj();
 	XMMATRIX world = XMLoadFloat4x4(&mSkullWorld);
 	XMMATRIX worldViewProj = world*view*proj;
 	mEffect->SetWorldViewProj(worldViewProj);
@@ -99,51 +66,6 @@ void SkullApp::DrawScene()
 	}
 
 	HR(mSwapChain->Present(0, 0));
-}
-
-void SkullApp::OnMouseDown(WPARAM btnState, int x, int y)
-{
-	mLastMousePos.x = x;
-	mLastMousePos.y = y;
-
-	SetCapture(mhMainWnd);
-}
-
-void SkullApp::OnMouseUp(WPARAM btnState, int x, int y)
-{
-	ReleaseCapture();
-}
-
-void SkullApp::OnMouseMove(WPARAM btnState, int x, int y)
-{
-	if ((btnState & MK_LBUTTON) != 0)
-	{
-		// Make each pixel correspond to a quarter of a degree.
-		float dx = XMConvertToRadians(0.25f*static_cast<float>(x - mLastMousePos.x));
-		float dy = XMConvertToRadians(0.25f*static_cast<float>(y - mLastMousePos.y));
-
-		// Update angles based on input to orbit camera around box.
-		mTheta += dx;
-		mPhi += dy;
-
-		// Restrict the angle mPhi.
-		mPhi = MathHelper::Clamp(mPhi, 0.1f, XM_PI - 0.1f);
-	}
-	else if ((btnState & MK_RBUTTON) != 0)
-	{
-		// Make each pixel correspond to 0.2 unit in the scene.
-		float dx = 0.05f*static_cast<float>(x - mLastMousePos.x);
-		float dy = 0.05f*static_cast<float>(y - mLastMousePos.y);
-
-		// Update the camera radius based on input.
-		mRadius += dx - dy;
-
-		// Restrict the radius.
-		mRadius = MathHelper::Clamp(mRadius, 5.0f, 50.0f);
-	}
-
-	mLastMousePos.x = x;
-	mLastMousePos.y = y;
 }
 
 void SkullApp::BuildGeometryBuffers()
