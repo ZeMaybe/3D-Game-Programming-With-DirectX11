@@ -188,9 +188,7 @@ public:
 
 	ID3DX11EffectShaderResourceVariable* TreeTextureMapArray;
 };
-
-
-
+ 
 class VecAddEffect : public Effect
 {
 public:
@@ -207,8 +205,7 @@ public:
 	ID3DX11EffectShaderResourceVariable* InputB;
 	ID3DX11EffectUnorderedAccessViewVariable* Output;
 };
-
-
+ 
 class BlurEffect : public Effect
 {
 public:
@@ -260,7 +257,7 @@ public:
 
 	ID3DX11EffectShaderResourceVariable* DiffuseMap;
 };
-
+ 
 class Effects
 {
 public:
