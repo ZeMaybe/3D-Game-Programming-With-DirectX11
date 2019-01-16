@@ -6,54 +6,7 @@
 
 using namespace DirectX;
  
-//void InstancingAndCullingApp::DrawScene()
-//{
-//	md3dImmediateContext->ClearRenderTargetView(mRenderTargetView, reinterpret_cast<const float*>(&Colors::Silver));
-//	md3dImmediateContext->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-//
-//	md3dImmediateContext->IASetInputLayout(InputLayouts::InstancedBasic32);
-//	md3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-//
-//	UINT stride[2] = { sizeof(Vertex::Basic32), sizeof(InstancedData) };
-//	UINT offset[2] = { 0,0 };
-//
-//	ID3D11Buffer* vbs[2] = { mSkullVB, mInstancedBuffer };
-//
-//	XMMATRIX view = mCam.View();
-//	XMMATRIX proj = mCam.Proj();
-//	XMMATRIX viewProj = mCam.ViewProj();
-//
-//	// Set per frame constants.
-//	Effects::InstancedBasicFX->SetDirLights(mDirLights);
-//	Effects::InstancedBasicFX->SetEyePosW(mCam.GetPosition());
-//
-//	ID3DX11EffectTechnique* activeTech = Effects::InstancedBasicFX->Light3Tech;
-//
-//	D3DX11_TECHNIQUE_DESC techDesc;
-//	activeTech->GetDesc(&techDesc);
-//	for (UINT p = 0; p < techDesc.Passes; ++p)
-//	{
-//		// Draw the skull.
-//
-//		md3dImmediateContext->IASetVertexBuffers(0, 2, vbs, stride, offset);
-//		md3dImmediateContext->IASetIndexBuffer(mSkullIB, DXGI_FORMAT_R32_UINT, 0);
-//
-//		XMMATRIX world = XMLoadFloat4x4(&mSkullWorld);
-//		XMMATRIX worldInvTranspose = MathHelper::InverseTranspose(world);
-//
-//		Effects::InstancedBasicFX->SetWorld(world);
-//		Effects::InstancedBasicFX->SetWorldInvTranspose(worldInvTranspose);
-//		Effects::InstancedBasicFX->SetViewProj(viewProj);
-//		Effects::InstancedBasicFX->SetMaterial(mSkullMat);
-//
-//		activeTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
-//		md3dImmediateContext->DrawIndexedInstanced(mSkullIndexCount, mVisibleObjectCount, 0, 0, 0);
-//	}
-//
-//	HR(mSwapChain->Present(0, 0));
-//}
-//
-//
+InstancingAndCullingApp theApp;
 
 InstancingAndCullingApp::InstancingAndCullingApp()
 {
@@ -91,9 +44,8 @@ InstancingAndCullingApp::~InstancingAndCullingApp()
 	ReleaseCOM(mSkullVB);
 	ReleaseCOM(mSkullIB);
 	ReleaseCOM(mInstancedBuffer);
-
-//	Effects::DestroyAll();
-//	InputLayouts::DestroyAll();
+	ReleaseCOM(mInputLayout);
+	SafeDelete(mEffect);
 }
 
 bool InstancingAndCullingApp::Init(HINSTANCE hInstance)
@@ -101,8 +53,8 @@ bool InstancingAndCullingApp::Init(HINSTANCE hInstance)
 	if (!D3DApp::Init(hInstance))
 		return false;
 
-	//Effects::InitAll(md3dDevice);
-	//InputLayouts::InitAll(md3dDevice);
+	mEffect = new InstancedBasicEffect(md3dDevice, L"../FX/InstancedBasic.fxo");
+	mInputLayout = mInputLayouts.InitLayout(md3dDevice, mEffect->Light1Tech, L"InstancedPosNormalTexCod");
 
 	BuildSkullGeometryBuffers();
 	BuildInstancedBuffer();
@@ -129,9 +81,9 @@ void InstancingAndCullingApp::UpdateScene(float dt)
 
 	// Perform frustum culling.
 	mCam.UpdateViewMatrix();
-	mVisibleObjectCount = 0;
+	mVisibleObjectCount = mInstancedData.size();
 
-	if (mFrustumCullingEnabled)
+	/*if (mFrustumCullingEnabled)
 	{
 		XMVECTOR detView = XMMatrixDeterminant(mCam.View());
 		XMMATRIX invView = XMMatrixInverse(&detView, mCam.View());
@@ -147,27 +99,24 @@ void InstancingAndCullingApp::UpdateScene(float dt)
 
 			XMMATRIX toLocal = XMMatrixMultiply(invView, invWorld);
 
+			XMVECTOR scale;
+			XMVECTOR rotQuat;
+			XMVECTOR translation;
+			XMMatrixDecompose(&scale, &rotQuat, &translation, toLocal);
+
+			BoundingFrustum localspaceFrustum;
+			
 
 
 		}
 
-	}
+	}*/
 
 
 	//	if (mFrustumCullingEnabled)
 	//	{
 	//		for (UINT i = 0; i < mInstancedData.size(); ++i)
 	//		{
-	//
-	//			// View space to the object's local space.
-	//			XMMATRIX toLocal = XMMatrixMultiply(invView, invWorld);
-	//
-	//			// Decompose the matrix into its individual parts.
-	//			XMVECTOR scale;
-	//			XMVECTOR rotQuat;
-	//			XMVECTOR translation;
-	//			XMMatrixDecompose(&scale, &rotQuat, &translation, toLocal);
-	//
 	//			// Transform the camera frustum from view space to the object's local space.
 	//			XNA::Frustum localspaceFrustum;
 	//			XNA::TransformFrustum(&localspaceFrustum, &mCamFrustum, XMVectorGetX(scale), rotQuat, translation);
@@ -209,7 +158,44 @@ void InstancingAndCullingApp::UpdateScene(float dt)
 
 void InstancingAndCullingApp::DrawScene()
 {
+	D3DApp::DrawScene();
 
+	md3dImmediateContext->IASetInputLayout(mInputLayout);
+	md3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	UINT stride[2] = { sizeof(Vertex::PosNormalTexCod),sizeof(InstancedData) };
+	UINT offset[2] = { 0,0 };
+
+	ID3D11Buffer* vbs[2] = { mSkullVB,mInstancedBuffer };
+	
+	XMMATRIX view = mCam.View();
+	XMMATRIX proj = mCam.Proj();
+	XMMATRIX viewProj = mCam.ViewProj();
+	
+	mEffect->SetDirLights(mDirLights);
+	mEffect->SetEyePosW(mCam.GetPosition());
+	
+	
+	ID3DX11EffectTechnique* activeTech = mEffect->Light3Tech;
+	D3DX11_TECHNIQUE_DESC techDesc;
+	activeTech->GetDesc(&techDesc);
+	for (UINT p = 0; p < techDesc.Passes; ++p)
+	{
+		md3dImmediateContext->IASetVertexBuffers(0, 2, vbs, stride, offset);
+		md3dImmediateContext->IASetIndexBuffer(mSkullIB, DXGI_FORMAT_R32_UINT, 0);
+
+		XMMATRIX world = XMLoadFloat4x4(&mSkullWorld);
+		XMMATRIX worldInvTranspose = MathHelper::InverseTranspose(world);
+
+		mEffect->SetWorld(world);
+		mEffect->SetWorldInvTranspose(worldInvTranspose);
+		mEffect->SetViewProj(viewProj);
+		mEffect->SetMaterial(mSkullMat);
+
+		activeTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
+		md3dImmediateContext->DrawIndexedInstanced(mSkullIndexCount, mVisibleObjectCount, 0, 0, 0);
+	}
+	HR(mSwapChain->Present(0, 0));
 }
 
 void InstancingAndCullingApp::BuildSkullGeometryBuffers()
@@ -326,7 +312,9 @@ void InstancingAndCullingApp::BuildInstancedBuffer()
 	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	vbd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	vbd.MiscFlags = 0;
-	vbd.StructureByteStride = 0;
+	vbd.StructureByteStride = 0; 
+	D3D11_SUBRESOURCE_DATA vinitData;
+	vinitData.pSysMem = &mInstancedData[0];
 
-	HR(md3dDevice->CreateBuffer(&vbd, 0, &mInstancedBuffer));
+	HR(md3dDevice->CreateBuffer(&vbd, &vinitData, &mInstancedBuffer));
 }

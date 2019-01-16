@@ -4,6 +4,7 @@
 
 #include "D3DApp.h"
 #include "D3DEffects.h"
+#include "Vertex.h"
 #include <DirectXCollision.h>
 
 struct InstancedData
@@ -37,13 +38,17 @@ private:
 	//XNA::AxisAlignedBox mSkullBox;
 	//XNA::Frustum mCamFrustum;
 
+	InstancedBasicEffect* mEffect = 0;
+	ID3D11InputLayout* mInputLayout = 0;
+	InputLayouts mInputLayouts;
+
 	DirectX::BoundingBox mSkullBox;
 	DirectX::BoundingFrustum mCamFrustum;
 
 	UINT mVisibleObjectCount =0;
 
 	// Keep a system memory copy of the world matrices for culling.
-	std::vector<InstancedData> mInstancedData;
+	std::vector<InstancedData> mInstancedData; 
 
 	bool mFrustumCullingEnabled = true;
 

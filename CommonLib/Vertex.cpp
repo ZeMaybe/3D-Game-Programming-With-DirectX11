@@ -67,12 +67,23 @@ void InputLayoutFactory::InitAllInputDesc()
 	InputLayoutDesc* TreePointSprite = new InputLayoutDesc(L"TreePointSprite", 2);
 	TreePointSprite->mDesc[0] = { "POSITION",0,DXGI_FORMAT_R32G32B32_FLOAT,0,0,D3D11_INPUT_PER_VERTEX_DATA,0 };
 	TreePointSprite->mDesc[1] = { "SIZE",0,DXGI_FORMAT_R32G32_FLOAT,0,12,D3D11_INPUT_PER_VERTEX_DATA,0 };
-	
+
+	InputLayoutDesc* InstancedPosNormalTexCod = new InputLayoutDesc(L"InstancedPosNormalTexCod", 8);
+	InstancedPosNormalTexCod->mDesc[0] = {"POSITION",0,DXGI_FORMAT_R32G32B32_FLOAT,0,0,D3D11_INPUT_PER_VERTEX_DATA,0};
+	InstancedPosNormalTexCod->mDesc[1] = {"NORMAL",0,DXGI_FORMAT_R32G32B32_FLOAT,0,12,D3D11_INPUT_PER_VERTEX_DATA,0};
+	InstancedPosNormalTexCod->mDesc[2] = {"TEXCOORD",0,DXGI_FORMAT_R32G32_FLOAT,0,24,D3D11_INPUT_PER_VERTEX_DATA,0};
+	InstancedPosNormalTexCod->mDesc[3] = { "WORLD",0,DXGI_FORMAT_R32G32B32A32_FLOAT,1,0,D3D11_INPUT_PER_INSTANCE_DATA,1 };
+	InstancedPosNormalTexCod->mDesc[4] = { "WORLD",1,DXGI_FORMAT_R32G32B32A32_FLOAT,1,16,D3D11_INPUT_PER_INSTANCE_DATA,1 };
+	InstancedPosNormalTexCod->mDesc[5] = { "WORLD",2,DXGI_FORMAT_R32G32B32A32_FLOAT,1,32,D3D11_INPUT_PER_INSTANCE_DATA,1 };
+	InstancedPosNormalTexCod->mDesc[6] = { "WORLD",3,DXGI_FORMAT_R32G32B32A32_FLOAT,1,48,D3D11_INPUT_PER_INSTANCE_DATA,1 };
+	InstancedPosNormalTexCod->mDesc[7] = {"COLOR",0,DXGI_FORMAT_R32G32B32A32_FLOAT,1,64,D3D11_INPUT_PER_INSTANCE_DATA,1};
+
 	mAllInputDesc.insert(InputPair(OnlyPos->mLayoutName, OnlyPos));
 	mAllInputDesc.insert(InputPair(PosNormal->mLayoutName,PosNormal));
 	mAllInputDesc.insert(InputPair(PosColor->mLayoutName, PosColor));
 	mAllInputDesc.insert(InputPair(PosNormalTexCod->mLayoutName, PosNormalTexCod));
 	mAllInputDesc.insert(InputPair(TreePointSprite->mLayoutName, TreePointSprite));
+	mAllInputDesc.insert(InputPair(InstancedPosNormalTexCod->mLayoutName, InstancedPosNormalTexCod));
 }
 
 Vertex::PosNormalTexCod::PosNormalTexCod()

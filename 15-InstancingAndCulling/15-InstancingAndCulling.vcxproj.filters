@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="FX">
+      <UniqueIdentifier>{9795d280-4825-4df7-a2a9-46ecf036f569}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="InstancingAndCullingApp.h">
@@ -23,5 +26,10 @@
     <ClCompile Include="InstancingAndCullingApp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\FX\InstancedBasic.fx">
+      <Filter>FX</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>
